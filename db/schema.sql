@@ -6,6 +6,8 @@ drop schema if exists app_private cascade;
 create schema app_public;
 create schema app_private;
 
+grant usage on schema app_public to graphiledemo_visitor;
+
 --------------------------------------------------------------------------------
 
 create function app_private.tg_update_timestamps() returns trigger as $$
