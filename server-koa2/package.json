@@ -1,0 +1,20 @@
+{
+  "name": "server-koa",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "if [ -x ../.env ]; then . ../.env; fi; nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "dependencies": {
+    "koa": "2.5.1",
+    "postgraphile": "4.0.0-rc.1"
+  },
+  "devDependencies": {
+    "nodemon": "1.17.5"
+  }
+}
