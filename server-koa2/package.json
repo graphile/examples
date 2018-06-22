@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "if [ -x ../.env ]; then . ../.env; fi; nodemon server.js",
+    "start": "if [ -x ../.env ]; then . ../.env; fi; NODE_ENV=development nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Benjie Gillam <code@benjiegillam.com>",
