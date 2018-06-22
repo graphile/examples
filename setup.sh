@@ -19,6 +19,15 @@ export PORT=8349
 export ROOT_DOMAIN="localhost:\$PORT"
 export ROOT_URL="http://\$ROOT_DOMAIN"
 export REDIS_URL="redis://localhost/3"
+
+# Create an application, then add the secrets below https://github.com/settings/applications/new
+# Name: GraphileDemo
+# Homepage URL: http://localhost:8349
+# Authorization callback URL: http://localhost:8349/auth/github/callback
+# Client ID:
+export GITHUB_KEY=""
+# Client Secret:
+export GITHUB_SECRET=""
 CONFIG
 
 # To source our .env file from the shell it has to be executable.
