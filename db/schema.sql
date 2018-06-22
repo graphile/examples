@@ -40,7 +40,7 @@ create table app_public.users (
 alter table app_public.users enable row level security;
 create trigger _100_timestamps after insert or update on app_public.users for each row execute procedure app_private.tg_update_timestamps();
 
-comment on table app_public.users is E'@omit create\nA user who can log in to the application.';
+comment on table app_public.users is E'@omit create,all\nA user who can log in to the application.';
 comment on column app_public.users.id is E'@omit update';
 comment on column app_public.users.name is E'Public-facing name (or pseudonym) of the user.';
 comment on column app_public.users.avatar_url is E'Optional avatar URL.';
@@ -85,7 +85,7 @@ create table app_public.user_emails (
 create unique index uniq_user_emails_verified_email on app_public.user_emails(email) where is_verified is true;
 alter table app_public.user_emails enable row level security;
 create trigger _100_timestamps after insert or update on app_public.user_emails for each row execute procedure app_private.tg_update_timestamps();
-comment on table app_public.user_emails is E'@omit update\nInformation about a user''s email address.';
+comment on table app_public.user_emails is E'@omit update,all\nInformation about a user''s email address.';
 comment on column app_public.user_emails.user_id is E'@omit';
 comment on column app_public.user_emails.email is E'The users email address, in `a@b.c` format.';
 comment on column app_public.user_emails.is_verified is E'True if the user has is_verified their email address (by clicking the link in the email we sent them, or logging in with a social login provider), false otherwise.';
@@ -121,7 +121,7 @@ create table app_public.user_authentications (
 alter table app_public.user_authentications enable row level security;
 create trigger _100_timestamps after insert or update on app_public.user_authentications for each row execute procedure app_private.tg_update_timestamps();
 
-comment on table app_public.user_authentications is E'@omit create,update\nContains information about the login providers this user has used, so that they may disconnect them should they wish.';
+comment on table app_public.user_authentications is E'@omit create,update,all\nContains information about the login providers this user has used, so that they may disconnect them should they wish.';
 comment on column app_public.user_authentications.user_id is E'@omit';
 comment on column app_public.user_authentications.service is E'The login service used, e.g. `twitter` or `password`.';
 comment on column app_public.user_authentications.identifier is E'A unique identifier for the user within the login service. For the `password` login service, the users ID will be used.';
@@ -309,7 +309,7 @@ create table app_public.topics (
 alter table app_public.topics enable row level security;
 create trigger _100_timestamps after insert or update on app_public.topics for each row execute procedure app_private.tg_update_timestamps();
 
-comment on table app_public.topics is E'An individual message thread within a Forum.';
+comment on table app_public.topics is E'@omit all\nAn individual message thread within a Forum.';
 comment on column app_public.topics.id is E'@omit create,update';
 comment on column app_public.topics.forum_id is E'@omit update';
 comment on column app_public.topics.user_id is E'@omit create,update';
@@ -340,7 +340,7 @@ create table app_public.posts (
 alter table app_public.posts enable row level security;
 create trigger _100_timestamps after insert or update on app_public.posts for each row execute procedure app_private.tg_update_timestamps();
 
-comment on table app_public.posts is E'An individual message thread within a Forum.';
+comment on table app_public.posts is E'@omit all\nAn individual message thread within a Forum.';
 comment on column app_public.posts.id is E'@omit create,update';
 comment on column app_public.posts.topic_id is E'@omit update';
 comment on column app_public.posts.user_id is E'@omit create,update';
