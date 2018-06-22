@@ -15,26 +15,24 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, callback) => {
-  const done = (e, u) => {
-    // Break out of the promise & try/catch so that we don't call the callback more than once.
-    setTimeout(() => {
-      callback(e, u);
-    }, 0);
-  };
+  let error = null;
+  let user;
   try {
     const {
-      rows: [user],
+      rows,
     } = await rootPgPool.query(
       `select users.* from app_public.users where users.id = $1`,
       [id]
     );
-    if (!user) {
-      done(null, false);
-      return;
+    if (!rows.length) {
+      user = false;
+    } else {
+      user = rows[0];
     }
-    done(null, user);
   } catch (e) {
-    done(e);
+    error = e;
+  } finally {
+    callback(error, user);
   }
 });
 
@@ -76,9 +74,11 @@ if (process.env.GITHUB_KEY && process.env.GITHUB_SECRET) {
       passReqToCallback: true,
     },
     async function(req, accessToken, refreshToken, profile, done) {
+      let error;
+      let user;
       try {
         const {
-          rows: [user],
+          rows,
         } = await rootPgPool.query(
           `select * from app_private.link_or_register_user($1, $2, $3, $4, $5);`,
           [
@@ -96,9 +96,11 @@ if (process.env.GITHUB_KEY && process.env.GITHUB_SECRET) {
             }),
           ]
         );
-        done(null, user);
+        user = rows[0] || false;
       } catch (e) {
-        done(e);
+        error = e;
+      } finally {
+        done(error, user);
       }
     }
   ));
@@ -118,9 +120,9 @@ if (process.env.GITHUB_KEY && process.env.GITHUB_SECRET) {
 }
 
 app.use(route.get('/logout',
-  ctx => {
-    ctx.logout()
-    ctx.redirect('/')
+  async ctx => {
+    ctx.logout();
+    ctx.redirect('/');
   }
 ));
 
