@@ -117,6 +117,13 @@ if (process.env.GITHUB_KEY && process.env.GITHUB_SECRET) {
   console.error("WARNING: you've not set up the GitHub application for login; see `.env` for details");
 }
 
+app.use(route.get('/logout',
+  ctx => {
+    ctx.logout()
+    ctx.redirect('/')
+  }
+));
+
 app.use(async (ctx, next) => {
   if (ctx.path === '/') {
     ctx.redirect('/graphiql');
