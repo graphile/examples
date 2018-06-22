@@ -1,3 +1,4 @@
+const fs = require('fs');
 const Koa = require('koa');
 const { postgraphile } = require('postgraphile');
 const bodyParser = require('koa-bodyparser');
@@ -8,7 +9,6 @@ const { Strategy: GitHubStrategy } = require('passport-github');
 const pg = require('pg');
 
 const rootPgPool = new pg.Pool({ connectionString: process.env.ROOT_DATABASE_URL });
-
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -39,6 +39,24 @@ passport.deserializeUser(async (id, callback) => {
 });
 
 const isDev = process.env.NODE_ENV === 'development';
+
+if (isDev) {
+  // Install the watch fixtures manually
+  const fixtures = fs.readFileSync(
+    require.resolve("graphile-build-pg/res/watch-fixtures.sql"),
+    "utf8"
+  );
+  rootPgPool.query(fixtures).then(
+    () => {
+      console.log(`Loaded watch fixtures ✅`);
+      console.log(`Ignore the "Failed to setup watch fixtures" warning`);
+    },
+    e => {
+      console.error("Failed to load watch fixtures 🔥");
+      console.error(e);
+    }
+  );
+}
 const app = new Koa();
 
 app.use(bodyParser())
