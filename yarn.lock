@@ -1803,9 +1803,9 @@ postgraphile-core@4.0.0-rc.1:
     graphile-build "4.0.0-rc.1"
     graphile-build-pg "4.0.0-rc.1"
 
-postgraphile@4.0.0-rc.1:
-  version "4.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/postgraphile/-/postgraphile-4.0.0-rc.1.tgz#2ca9a417e9d100074cd3b80a6fcf0cd43a781307"
+postgraphile@4.0.0-rc.1.1:
+  version "4.0.0-rc.1.1"
+  resolved "https://registry.yarnpkg.com/postgraphile/-/postgraphile-4.0.0-rc.1.1.tgz#07f72c936d32d541375bf98bb05d4bce8d504b84"
   dependencies:
     body-parser "^1.15.2"
     chalk "1.1.3"
