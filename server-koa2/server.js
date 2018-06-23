@@ -1,12 +1,19 @@
 const fs = require('fs');
 const Koa = require('koa');
 const { postgraphile } = require('postgraphile');
-const bodyParser = require('koa-bodyparser');
 const session = require('koa-session');
 const passport = require('koa-passport');
 const route = require('koa-route');
 const { Strategy: GitHubStrategy } = require('passport-github');
 const pg = require('pg');
+
+// Unnecessary middlewares to check compatibility
+const helmet = require('koa-helmet');
+const cors = require('@koa/cors');
+const jwt = require('koa-jwt');
+const compress = require('koa-compress');
+const bunyanLogger = require('koa-bunyan-logger');
+const bodyParser = require('koa-bodyparser');
 
 const rootPgPool = new pg.Pool({ connectionString: process.env.ROOT_DATABASE_URL });
 
@@ -57,6 +64,13 @@ if (isDev) {
 }
 const app = new Koa();
 
+// These middlewares aren't required, I'm using them to check PostGraphile
+// works with Koa
+app.use(helmet())
+app.use(cors())
+//app.use(jwt({secret: process.env.SECRET}))
+app.use(compress())
+app.use(bunyanLogger())
 app.use(bodyParser())
 
 app.keys = [process.env.SECRET]
