@@ -1,3 +1,5 @@
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 const fs = require('fs');
 const Koa = require('koa');
 const { postgraphile } = require('postgraphile');
