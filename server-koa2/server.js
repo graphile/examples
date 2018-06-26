@@ -1,5 +1,6 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
+const http = require('http');
 const fs = require('fs');
 const Koa = require('koa');
 const { postgraphile } = require('postgraphile');
@@ -166,6 +167,7 @@ app.use(postgraphile(
 
 const proxy = httpProxy.createProxyServer({
   target: `http://localhost:${process.env.CLIENT_PORT}`,
+  ws: true,
 });
 app.use((ctx, next) => {
   // Bypass koa for HTTP proxying
@@ -173,6 +175,11 @@ app.use((ctx, next) => {
   proxy.web(ctx.req, ctx.res, {});
 });
 
+const server = http.createServer(app.callback());
+server.on('upgrade', (req, socket, head) => {
+  proxy.ws(req, socket, head);
+});
+
 const PORT = parseInt(process.env.PORT, 10) || 3000
-app.listen(PORT);
+server.listen(PORT);
 console.log(`Listening on port ${PORT}`);
