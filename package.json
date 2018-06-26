@@ -3,7 +3,13 @@
     "db:reset": "psql -X1v ON_ERROR_STOP=1 graphiledemo -f ./db/schema.sql"
   },
   "private": true,
-  "workspaces": [
-    "*"
-  ]
+  "workspaces": {
+    "packages": [
+      "*"
+    ],
+    "nohoist": [
+      "**/react-scripts",
+      "**/react-scripts/**"
+    ]
+  }
 }
