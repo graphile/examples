@@ -172,7 +172,10 @@ const proxy = httpProxy.createProxyServer({
 app.use((ctx, next) => {
   // Bypass koa for HTTP proxying
   ctx.respond = false;
-  proxy.web(ctx.req, ctx.res, {});
+  proxy.web(ctx.req, ctx.res, {}, (e) => {
+    ctx.res.statusCode = 503;
+    ctx.res.end('Error occurred while proxying to client application - is it running?');
+  });
 });
 
 const server = http.createServer(app.callback());
