@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@koa/cors": "2.2.1",
+    "http-proxy": "1.17.0",
     "koa": "2.5.1",
     "koa-bodyparser": "4.2.1",
     "koa-bunyan-logger": "2.0.0",

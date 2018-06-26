@@ -6,6 +6,7 @@ const { postgraphile } = require('postgraphile');
 const session = require('koa-session');
 const passport = require('koa-passport');
 const route = require('koa-route');
+const httpProxy = require('http-proxy');
 const { Strategy: GitHubStrategy } = require('passport-github');
 const pg = require('pg');
 
@@ -142,14 +143,6 @@ app.use(route.get('/logout',
   }
 ));
 
-app.use(async (ctx, next) => {
-  if (ctx.path === '/') {
-    ctx.redirect('/graphiql');
-  } else {
-    return next();
-  }
-});
-
 app.use((ctx, next) => {
   // PostGraphile deals with (req, res) but we want access to sessions, so we make the ctx available on req.
   ctx.req.ctx = ctx;
@@ -170,6 +163,15 @@ app.use(postgraphile(
     },
   }
 ));
+
+const proxy = httpProxy.createProxyServer({
+  target: `http://localhost:${process.env.CLIENT_PORT}`,
+});
+app.use((ctx, next) => {
+  // Bypass koa for HTTP proxying
+  ctx.respond = false;
+  proxy.web(ctx.req, ctx.res, {});
+});
 
 const PORT = parseInt(process.env.PORT, 10) || 3000
 app.listen(PORT);
