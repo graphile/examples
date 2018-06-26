@@ -8,7 +8,7 @@
     "react-scripts": "1.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "if [ -x ../.env ]; then source ../.env; fi; BROWSER=none PORT=$CLIENT_PORT react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
