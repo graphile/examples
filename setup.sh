@@ -15,6 +15,7 @@ export TEST_ROOT_DATABASE_URL="postgresql://graphiledemo:$GENERATED_PASSWORD@loc
 export TEST_AUTH_DATABASE_URL="postgresql://graphiledemo_authenticator:$GENERATED_PASSWORD2@localhost/graphiledemo_test"
 export SECRET="$(openssl rand -base64 48)"
 export JWT_SECRET="$(openssl rand -base64 48)"
+export CLIENT_PORT=8350
 export PORT=8349
 export ROOT_DOMAIN="localhost:\$PORT"
 export ROOT_URL="http://\$ROOT_DOMAIN"
@@ -84,3 +85,4 @@ SQL
 
 # All done
 echo "✅ Setup success"
+psql -X1 -v ON_ERROR_STOP=1 graphiledemo -f db/schema.sql
