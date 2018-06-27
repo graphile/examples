@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "db:reset": "psql -X1v ON_ERROR_STOP=1 graphiledemo -f ./db/schema.sql"
+    "db:reset": "psql -X1v ON_ERROR_STOP=1 graphiledemo -f ./db/schema.sql",
+    "lint": "eslint ."
   },
   "private": true,
   "workspaces": {
