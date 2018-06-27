@@ -7,8 +7,9 @@ module.exports = {
   plugins: ["prettier", "graphql", "react"],
   env: {
     browser: true,
-    node: true,
     es6: true,
+    jest: true,
+    node: true,
   },
   rules: {
     "prettier/prettier": [
