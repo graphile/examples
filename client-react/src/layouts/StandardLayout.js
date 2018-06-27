@@ -1,9 +1,13 @@
-import React from 'react';
-import Header from '../components/Header';
+import React from "react";
+import Header from "../components/Header";
 
-import gql from 'graphql-tag';
+import gql from "graphql-tag";
 
-const Empty = () => <div>No <tt>bodyComponent</tt> provided</div>
+const Empty = () => (
+  <div>
+    No <tt>bodyComponent</tt> provided
+  </div>
+);
 
 export default class StandardLayout extends React.Component {
   static QueryFragment = gql`
@@ -17,12 +21,16 @@ export default class StandardLayout extends React.Component {
   render() {
     const {
       graphql: { loading, error, data },
-      bodyComponent: BodyComponent = Empty
+      bodyComponent: BodyComponent = Empty,
     } = this.props;
 
     return (
       <div>
-        <Header loading={loading} error={error} user={data && data.currentUser} />
+        <Header
+          loading={loading}
+          error={error}
+          user={data && data.currentUser}
+        />
         <BodyComponent loading={loading} error={error} data={data} />
       </div>
     );

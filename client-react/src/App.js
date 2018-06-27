@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { Switch, Route } from 'react-router-dom';
-import HomeRoute from './routes/HomeRoute';
-import NotFoundRoute from './routes/NotFoundRoute';
-import LoginRoute from './routes/LoginRoute';
+import React, { Component } from "react";
+import { Switch, Route } from "react-router-dom";
+import HomeRoute from "./routes/HomeRoute";
+import NotFoundRoute from "./routes/NotFoundRoute";
+import LoginRoute from "./routes/LoginRoute";
 
 class App extends Component {
   render() {

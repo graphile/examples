@@ -2,8 +2,8 @@ import React from "react";
 import gql from "graphql-tag";
 import logo from "../logo.svg";
 import { Link } from "react-router-dom";
-import { propType } from 'graphql-anywhere';
-import PropTypes from 'prop-types';
+import { propType } from "graphql-anywhere";
+import PropTypes from "prop-types";
 
 export default class Header extends React.Component {
   static UserFragment = gql`
@@ -19,7 +19,7 @@ export default class Header extends React.Component {
     user: propType(Header.UserFragment),
     loading: PropTypes.bool,
     error: PropTypes.object,
-  }
+  };
 
   renderUser() {
     const { user, loading, error } = this.props;
