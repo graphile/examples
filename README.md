@@ -17,6 +17,8 @@ This will run the koa2 server and react client.
 
 It's recommended that you review the setup.sh script before executing it.
 
+The first user account to log in will automatically be made an administrator.
+
 Login via GitHub
 ----------------
 
