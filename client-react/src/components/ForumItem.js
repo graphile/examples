@@ -30,7 +30,7 @@ export default class ForumItem extends React.Component {
       <div className="ForumItem">
         <div className="ForumItem-name">{forum.name}</div>
         <div className="ForumItem-description">{forum.description}</div>
-        {currentUser.isAdmin ? (
+        {currentUser && currentUser.isAdmin ? (
           <div className="ForumItem-tools">[edit]</div>
         ) : null}
       </div>

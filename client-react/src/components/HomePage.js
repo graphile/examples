@@ -2,6 +2,7 @@ import React from "react";
 import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
 import ForumItem from "./ForumItem";
+import Main from "./Main";
 
 export default class HomePage extends React.Component {
   static QueryFragment = gql`
@@ -31,13 +32,13 @@ export default class HomePage extends React.Component {
     const { data } = this.props;
     const { loading, error, currentUser, allForums } = data;
     if (loading) {
-      return <div className="Main">Loading...</div>;
+      return <Main>Loading...</Main>;
     }
     if (error) {
-      return <div className="Main">Error {error.message}</div>;
+      return <Main>Error {error.message}</Main>;
     }
     return (
-      <div className="Main">
+      <Main>
         <h1>Forums</h1>
         {allForums.nodes.length ? (
           allForums.nodes.map(node => (
@@ -50,12 +51,12 @@ export default class HomePage extends React.Component {
         ) : (
           <div>
             There are no forums yet!{" "}
-            {currentUser.isAdmin
+            {currentUser && currentUser.isAdmin
               ? "Create one below..."
               : "Please check back later or contact an admin."}
           </div>
         )}
-      </div>
+      </Main>
     );
   }
 }

@@ -55,6 +55,16 @@ grant select on app_public.users to graphiledemo_visitor;
 grant update(name, avatar_url) on app_public.users to graphiledemo_visitor;
 grant delete on app_public.users to graphiledemo_visitor;
 
+create function app_private.tg_users__make_first_user_admin() returns trigger as $$
+begin
+  if not exists(select 1 from app_public.users) then
+    NEW.is_admin = true;
+  end if;
+  return NEW;
+end;
+$$ language plpgsql volatile;
+create trigger _200_make_first_user_admin before insert on app_public.users for each row execute procedure app_private.tg_users__make_first_user_admin();
+
 --------------------------------------------------------------------------------
 
 create function app_public.current_user_is_admin() returns bool as $$

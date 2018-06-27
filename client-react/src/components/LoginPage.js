@@ -2,6 +2,7 @@ import React from "react";
 import { Redirect } from "react-router-dom";
 import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
+import Main from "./Main";
 
 export default class LoginPage extends React.Component {
   static QueryFragment = gql`
@@ -19,21 +20,21 @@ export default class LoginPage extends React.Component {
   render() {
     const { loading, error, currentUser } = this.props.data;
     if (loading) {
-      return <div>Loading...</div>;
+      return <Main>Loading...</Main>;
     }
     if (error) {
-      return <div>Error {error.message}</div>;
+      return <Main>Error {error.message}</Main>;
     }
     if (currentUser) {
       return <Redirect to="/" />;
     } else {
       return (
-        <div>
+        <Main>
           <h1>Log in</h1>
           <p>
             With <a href="/auth/github">GitHub</a>
           </p>
-        </div>
+        </Main>
       );
     }
   }
