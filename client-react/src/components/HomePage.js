@@ -1,7 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import gql from 'graphql-tag';
 
 export default class HomePage extends React.Component {
+  static QueryFragment = gql`
+    fragment HomePage_QueryFragment on Query {
+      currentUser {
+        id
+      }
+    }
+  `
   render() {
     const {loading, error, data} = this.props;
     if (loading) {

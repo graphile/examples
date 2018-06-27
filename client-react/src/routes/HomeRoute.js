@@ -7,8 +7,10 @@ import HomePage from '../components/HomePage';
 const HomeRouteQuery = gql`
   query HomeRouteQuery {
     ...StandardLayout_QueryFragment
+    ...HomePage_QueryFragment
   }
-  ${StandardLayout.QueryFragment},
+  ${StandardLayout.QueryFragment}
+  ${HomePage.QueryFragment}
 `
 
 export default class HomeRoute extends React.Component {
