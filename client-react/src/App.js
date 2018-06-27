@@ -4,8 +4,6 @@ import HomeRoute from './routes/HomeRoute';
 import NotFoundRoute from './routes/NotFoundRoute';
 import LoginRoute from './routes/LoginRoute';
 
-import './App.css';
-
 class App extends Component {
   render() {
     return (

@@ -7,6 +7,7 @@ const { postgraphile } = require('postgraphile');
 const session = require('koa-session');
 const passport = require('koa-passport');
 const route = require('koa-route');
+const static = require('koa-static');
 const httpProxy = require('http-proxy');
 const { Strategy: GitHubStrategy } = require('passport-github');
 const pg = require('pg');
@@ -164,6 +165,8 @@ app.use(postgraphile(
     },
   }
 ));
+
+app.use(static(`${__dirname}/../public`));
 
 const proxy = httpProxy.createProxyServer({
   target: `http://localhost:${process.env.CLIENT_PORT}`,
