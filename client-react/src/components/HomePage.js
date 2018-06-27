@@ -1,6 +1,7 @@
 import React from "react";
 import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
+import { Link } from "react-router-dom";
 import ForumItem from "./ForumItem";
 import Main from "./Main";
 
@@ -51,9 +52,17 @@ export default class HomePage extends React.Component {
         ) : (
           <div>
             There are no forums yet!{" "}
-            {currentUser && currentUser.isAdmin
-              ? "Create one below..."
-              : "Please check back later or contact an admin."}
+            {currentUser ? (
+              currentUser.isAdmin ? (
+                "Create one below..."
+              ) : (
+                "Please check back later or contact an admin."
+              )
+            ) : (
+              <span>
+                Perhaps you need to <Link to="/login">log in</Link>?
+              </span>
+            )}
           </div>
         )}
       </Main>
