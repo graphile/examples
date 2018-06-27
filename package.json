@@ -1,7 +1,10 @@
 {
   "scripts": {
     "db:reset": "psql -X1v ON_ERROR_STOP=1 graphiledemo -f ./db/schema.sql",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "client:react": "cd client-react; npm start",
+    "server:koa2": "cd server-koa2; npm start",
+    "start": "concurrently --kill-others 'npm run server:koa2' 'npm run client:react'"
   },
   "private": true,
   "workspaces": {
@@ -15,6 +18,7 @@
   },
   "devDependencies": {
     "babel-eslint": "8.2.5",
+    "concurrently": "3.6.0",
     "eslint": "5.0.1",
     "eslint-config-prettier": "2.9.0",
     "eslint-plugin-graphql": "2.1.1",
