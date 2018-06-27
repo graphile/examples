@@ -14,7 +14,7 @@ export default class HomePage extends React.Component {
         isAdmin
         ...ForumItem_CurrentUserFragment
       }
-      allForums {
+      allForums(first: 50) {
         nodes {
           nodeId
           ...ForumItem_ForumFragment
