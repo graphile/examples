@@ -14,14 +14,15 @@ export default class Header extends React.Component {
   `;
 
   renderUser() {
-    if (this.props.user) {
-      const username = this.props.user.name || `User ${this.props.user.id}`;
+    const { user, loading, error } = this.props;
+    if (user) {
+      const username = user.name || `User ${user.id}`;
       return (
-        <span>Logged in as {username}; <a href="/logout">Log out</a></span>
+        <span>Logged in as {user.isAdmin ? 'administrator' : ''} {username}; <a href="/logout">Log out</a></span>
       );
-    } else if (this.props.loading) {
+    } else if (loading) {
       return null;
-    } else if (this.props.error) {
+    } else if (error) {
       return null;
     } else {
       return (
@@ -29,6 +30,7 @@ export default class Header extends React.Component {
       );
     }
   }
+
   render() {
     return (
       <header className="Header">
