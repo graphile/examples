@@ -15,7 +15,7 @@ const pg = require("pg");
 // Unnecessary middlewares to check compatibility
 const helmet = require("koa-helmet");
 const cors = require("@koa/cors");
-const jwt = require("koa-jwt");
+// const jwt = require("koa-jwt");
 const compress = require("koa-compress");
 const bunyanLogger = require("koa-bunyan-logger");
 const bodyParser = require("koa-bodyparser");
@@ -173,10 +173,10 @@ const proxy = httpProxy.createProxyServer({
   target: `http://localhost:${process.env.CLIENT_PORT}`,
   ws: true,
 });
-app.use((ctx, next) => {
+app.use(ctx => {
   // Bypass koa for HTTP proxying
   ctx.respond = false;
-  proxy.web(ctx.req, ctx.res, {}, e => {
+  proxy.web(ctx.req, ctx.res, {}, _e => {
     ctx.res.statusCode = 503;
     ctx.res.end(
       "Error occurred while proxying to client application - is it running?"

@@ -23,5 +23,6 @@ module.exports = {
         argsIgnorePattern: "^_",
       },
     ],
+    "no-console": 0, // This is a demo, so logging console messages can be helpful. Remove this in production!
   },
 };
