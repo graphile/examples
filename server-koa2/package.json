@@ -11,6 +11,7 @@
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "dependencies": {
+    "@graphile-contrib/pg-simplify-inflector": "1.0.0",
     "@koa/cors": "2.2.1",
     "http-proxy": "1.17.0",
     "koa": "2.5.1",

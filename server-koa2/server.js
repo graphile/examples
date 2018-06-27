@@ -4,6 +4,7 @@ const http = require("http");
 const fs = require("fs");
 const Koa = require("koa");
 const { postgraphile } = require("postgraphile");
+const PgSimplifyInflectorPlugin = require('@graphile-contrib/pg-simplify-inflector');
 const session = require("koa-session");
 const passport = require("koa-passport");
 const route = require("koa-route");
@@ -164,6 +165,9 @@ app.use(
         "jwt.claims.user_id": req.ctx.state.user && req.ctx.state.user.id,
       };
     },
+    appendPlugins: [
+      PgSimplifyInflectorPlugin,
+    ],
   })
 );
 

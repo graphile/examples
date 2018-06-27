@@ -1,15 +1,26 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
+import ForumItem from "./ForumItem";
 
 export default class HomePage extends React.Component {
   static QueryFragment = gql`
     fragment HomePage_QueryFragment on Query {
       currentUser {
+        nodeId
         id
+        isAdmin
+        ...ForumItem_CurrentUserFragment
+      }
+      allForums {
+        nodes {
+          nodeId
+          ...ForumItem_ForumFragment
+        }
       }
     }
+    ${ForumItem.ForumFragment}
+    ${ForumItem.CurrentUserFragment}
   `;
 
   static propTypes = {
@@ -18,21 +29,33 @@ export default class HomePage extends React.Component {
 
   render() {
     const { data } = this.props;
-    const { loading, error, currentUser } = data;
+    const { loading, error, currentUser, allForums } = data;
     if (loading) {
-      return <div>Loading...</div>;
+      return <div className="Main">Loading...</div>;
     }
     if (error) {
-      return <div>Error {error.message}</div>;
+      return <div className="Main">Error {error.message}</div>;
     }
-    if (currentUser) {
-      return <div>Logged in as user {currentUser.id}</div>;
-    } else {
-      return (
-        <div>
-          To log in, <Link to="/login">click here</Link>
-        </div>
-      );
-    }
+    return (
+      <div className="Main">
+        <h1>Forums</h1>
+        {allForums.nodes.length ? (
+          allForums.nodes.map(node => (
+            <ForumItem
+              key={node.nodeId}
+              forum={node}
+              currentUser={currentUser}
+            />
+          ))
+        ) : (
+          <div>
+            There are no forums yet!{" "}
+            {currentUser.isAdmin
+              ? "Create one below..."
+              : "Please check back later or contact an admin."}
+          </div>
+        )}
+      </div>
+    );
   }
 }
