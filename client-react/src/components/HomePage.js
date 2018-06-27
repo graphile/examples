@@ -65,6 +65,12 @@ export default class HomePage extends React.Component {
             )}
           </div>
         )}
+        {currentUser && currentUser.isAdmin ? (
+          <div>
+            <h2>Create new forum</h2>
+            <p>Hello administrator! Would you like to create a new forum?</p>
+          </div>
+        ) : null}
       </Main>
     );
   }

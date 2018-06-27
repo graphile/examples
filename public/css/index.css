@@ -4,16 +4,6 @@ body {
   font-family: sans-serif;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin-top: 0;
-  padding-top: 0;
-}
-
 .Header {
   background-color: #222;
   color: white;
@@ -44,4 +34,14 @@ h6 {
 
 .Main {
   padding: 1rem;
+}
+
+.Main > h1:first-child,
+.Main > h2:first-child,
+.Main > h3:first-child,
+.Main > h4:first-child,
+.Main > h5:first-child,
+.Main > h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
 }
