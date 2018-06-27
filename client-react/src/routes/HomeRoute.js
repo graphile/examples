@@ -17,8 +17,17 @@ export default class HomeRoute extends React.Component {
   render() {
     return (
       <Query query={HomeRouteQuery}>
-        {graphql => (
-          <StandardLayout graphql={graphql} bodyComponent={HomePage} />
+        {({ loading, error, data }) => (
+          <StandardLayout
+            data={
+              {
+                ...data,
+                loading,
+                error,
+              } /* this mess is to make it compatible with graphql-anywhere's propType */
+            }
+            bodyComponent={HomePage}
+          />
         )}
       </Query>
     );
