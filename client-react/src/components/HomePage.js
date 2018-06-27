@@ -4,10 +4,12 @@ import { propType } from "graphql-anywhere";
 import { Link } from "react-router-dom";
 import ForumItem from "./ForumItem";
 import Main from "./Main";
+import CreateNewForumForm from "./CreateNewForumForm";
 
 export default class HomePage extends React.Component {
   static QueryFragment = gql`
     fragment HomePage_QueryFragment on Query {
+      ...CreateNewForumForm_QueryFragment
       currentUser {
         nodeId
         id
@@ -23,6 +25,7 @@ export default class HomePage extends React.Component {
     }
     ${ForumItem.ForumFragment}
     ${ForumItem.CurrentUserFragment}
+    ${CreateNewForumForm.QueryFragment}
   `;
 
   static propTypes = {
@@ -69,6 +72,13 @@ export default class HomePage extends React.Component {
           <div>
             <h2>Create new forum</h2>
             <p>Hello administrator! Would you like to create a new forum?</p>
+            <CreateNewForumForm
+              data={data}
+              onCreateForum={forum => {
+                // TODO: alter the cache
+                data.refetch();
+              }}
+            />
           </div>
         ) : null}
       </Main>

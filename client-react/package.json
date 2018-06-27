@@ -14,7 +14,8 @@
     "react-apollo": "2.1.6",
     "react-dom": "^16.4.1",
     "react-router-dom": "4.3.1",
-    "react-scripts": "1.1.4"
+    "react-scripts": "1.1.4",
+    "slug": "0.9.1"
   },
   "scripts": {
     "start": "if [ -x ../.env ]; then source ../.env; fi; BROWSER=none PORT=$CLIENT_PORT react-scripts start",
