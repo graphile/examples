@@ -60,12 +60,9 @@ GRANT ALL ON DATABASE graphiledemo TO graphiledemo;
 -- Some extensions require superuser privileges, so we create them before migration time.
 \\connect graphiledemo
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
-CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
-CREATE EXTENSION IF NOT EXISTS plv8;
 
 -- This is a copy of the setup above for our test database
 CREATE DATABASE graphiledemo_test OWNER graphiledemo;
@@ -75,12 +72,9 @@ GRANT CONNECT ON DATABASE graphiledemo_test TO graphiledemo_authenticator;
 GRANT ALL ON DATABASE graphiledemo_test TO graphiledemo;
 \\connect graphiledemo_test
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
-CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
-CREATE EXTENSION IF NOT EXISTS plv8;
 SQL
 
 # All done
