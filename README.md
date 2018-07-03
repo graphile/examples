@@ -13,7 +13,7 @@ yarn
 yarn start
 ```
 
-This will run the koa2 server and react client.
+This will run the koa2 server and react client. You can access it at http://localhost:8349/
 
 It's recommended that you review the setup.sh script before executing it.
 
