@@ -24,7 +24,7 @@ const server = http.createServer(app.callback());
 middleware.installStandardKoaMiddlewares(app);
 middleware.installSession(app);
 middleware.installPassport(app, { rootPgPool });
-middleware.installPostGraphile(app);
+middleware.installPostGraphile(app, { rootPgPool });
 middleware.installSharedStatic(app);
 middleware.installFrontendServer(app, server);
 

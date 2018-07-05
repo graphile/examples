@@ -32,7 +32,7 @@ comment on function  app_public.current_user_id() is E'@omit\nHandy method to ge
 
 create table app_public.users (
   id serial primary key,
-  username text not null,
+  username citext not null,
   name text,
   avatar_url text check(avatar_url ~ '^https?://[^/]+'),
 	is_admin boolean not null default false,
