@@ -32,6 +32,7 @@ comment on function  app_public.current_user_id() is E'@omit\nHandy method to ge
 
 create table app_public.users (
   id serial primary key,
+  username text not null,
   name text,
   avatar_url text check(avatar_url ~ '^https?://[^/]+'),
 	is_admin boolean not null default false,
@@ -84,9 +85,30 @@ $$ language sql stable set search_path from current;
 
 --------------------------------------------------------------------------------
 
+create table app_private.user_secrets (
+  user_id int not null primary key references app_public.users,
+  password_hash text,
+  password_attempts int not null default 0,
+  first_failed_password_attempt timestamptz,
+  reset_password_token text,
+  reset_password_token_generated timestamptz,
+  reset_password_attempts int not null default 0,
+  first_failed_reset_password_attempt timestamptz
+);
+
+create function app_private.tg_user_secrets__insert_with_user() returns trigger as $$
+begin
+  insert into app_private.user_secrets(user_id) values(NEW.id);
+  return NEW;
+end;
+$$ language plpgsql volatile;
+create trigger _500_insert_secrets after insert on app_public.users for each row execute procedure app_private.tg_user_secrets__insert_with_user();
+
+--------------------------------------------------------------------------------
+
 create table app_public.user_emails (
   id serial primary key,
-  user_id int not null references app_public.users on delete cascade,
+  user_id int not null default app_public.current_user_id() references app_public.users on delete cascade,
   email citext not null CHECK (email ~ '[^@]+@[^@]+\.[^@]+'),
   is_verified boolean not null default false,
   created_at timestamptz not null default now(),
@@ -104,15 +126,18 @@ comment on column app_public.user_emails.created_at is E'@omit create,update';
 comment on column app_public.user_emails.updated_at is E'@omit create,update';
 
 create policy select_own on app_public.user_emails for select using (user_id = app_public.current_user_id());
+create policy insert_own on app_public.user_emails for insert with check (user_id = app_public.current_user_id());
 create policy delete_own on app_public.user_emails for delete using (user_id = app_public.current_user_id()); -- TODO check this isn't the last one!
 grant select on app_public.user_emails to graphiledemo_visitor;
+grant insert (email) on app_public.user_emails to graphiledemo_visitor;
 grant delete on app_public.user_emails to graphiledemo_visitor;
 
 --------------------------------------------------------------------------------
 
 create table app_private.user_email_secrets (
   user_email_id int primary key references app_public.user_emails on delete cascade,
-  verification_token text
+  verification_token text,
+  password_reset_email_sent_at timestamptz
 );
 alter table app_private.user_email_secrets enable row level security;
 
@@ -126,16 +151,15 @@ create table app_public.user_authentications (
   details jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint uniq_user_authentications unique(service, identifier),
-	constraint check_user_authentications_password_service check(service <> 'password' or identifier = user_id::text)
+  constraint uniq_user_authentications unique(service, identifier)
 );
 alter table app_public.user_authentications enable row level security;
 create trigger _100_timestamps after insert or update on app_public.user_authentications for each row execute procedure app_private.tg_update_timestamps();
 
 comment on table app_public.user_authentications is E'@omit create,update,all\nContains information about the login providers this user has used, so that they may disconnect them should they wish.';
 comment on column app_public.user_authentications.user_id is E'@omit';
-comment on column app_public.user_authentications.service is E'The login service used, e.g. `twitter` or `password`.';
-comment on column app_public.user_authentications.identifier is E'A unique identifier for the user within the login service. For the `password` login service, the users ID will be used.';
+comment on column app_public.user_authentications.service is E'The login service used, e.g. `twitter` or `github`.';
+comment on column app_public.user_authentications.identifier is E'A unique identifier for the user within the login service.';
 comment on column app_public.user_authentications.details is E'@omit\nAdditional profile details extracted from this login method';
 comment on column app_public.user_authentications.created_at is E'@omit create,update';
 comment on column app_public.user_authentications.updated_at is E'@omit create,update';
@@ -155,20 +179,227 @@ alter table app_private.user_authentication_secrets enable row level security;
 
 --------------------------------------------------------------------------------
 
+create function app_public.forgot_password(email text) returns boolean as $$
+declare
+  v_user_email app_public.user_emails;
+  v_reset_token text;
+  v_reset_min_duration_between_emails interval = interval '30 minutes';
+  v_reset_max_duration interval = interval '3 days';
+begin
+  -- Find the matching user_email
+  select user_emails.* into v_user_email
+  from app_public.user_emails
+  where user_emails.email = forgot_password.email::citext
+  order by is_verified desc, id desc;
+
+  if not (v_user_email is null) then
+    -- See if we've triggered a reset recently
+    if exists(
+      select 1
+      from app_private.user_email_secrets
+      where user_email_id = v_user_email.id
+      and password_reset_email_sent_at is not null
+      and password_reset_email_sent_at > now() - v_reset_min_duration_between_emails
+    ) then
+      return true;
+    end if;
+
+    -- Fetch or generate reset token
+    update app_private.user_secrets
+    set
+      reset_password_token = (
+        case
+        when reset_password_token is null or reset_password_token_generated < NOW() - v_reset_max_duration
+        then encode(gen_random_bytes(6), 'hex')
+        else reset_password_token
+        end
+      ),
+      reset_password_token_generated = (
+        case
+        when reset_password_token is null or reset_password_token_generated < NOW() - v_reset_max_duration
+        then now()
+        else reset_password_token_generated
+        end
+      )
+    where user_id = v_user_email.user_id
+    returning reset_password_token into v_reset_token;
+
+    -- Don't allow spamming an email
+    update app_private.user_email_secrets
+    set password_reset_email_sent_at = now()
+    where user_email_id = v_user_email.id;
+
+    -- Trigger email send
+    perform app_jobs.add_job('user__forgot_password', json_build_object('id', v_user_email.user_id, 'email', v_user_email.email::text, 'token', v_reset_token));
+    return true;
+
+  end if;
+  return false;
+end;
+$$ language plpgsql security definer volatile;
+
+--------------------------------------------------------------------------------
+
+create function app_private.login(username text, password text) returns app_public.users as $$
+declare
+  v_user app_public.users;
+  v_user_secret app_private.user_secrets;
+  v_login_attempt_window_duration interval = interval '6 hours';
+begin
+  select users.* into v_user
+  from app_public.users
+  where
+    -- Match username against users username, or any verified email address
+    (
+      users.username = login.username
+    or
+      exists(
+        select 1
+        from app_public.user_emails
+        where user_id = users.id
+        and is_verified is true
+        and email = login.username::citext
+      )
+    );
+
+  if not (v_user is null) then
+    -- Load their secrets
+    select * into v_user_secret from app_private.user_secrets
+    where user_secrets.user_id = v_user.id;
+
+    -- Have there been too many login attempts?
+    if (
+      v_user_secret.first_failed_password_attempt is not null
+    and
+      v_user_secret.first_failed_password_attempt > NOW() - v_login_attempt_window_duration
+    and
+      v_user_secret.password_attempts >= 20
+    ) then
+      raise exception 'User account locked - too many login attempts' using errcode = 'LOCKD';
+    end if;
+
+    -- Not too many login attempts, let's check the password
+    if v_user_secret.password_hash = crypt(password, v_user_secret.password_hash) then
+      -- Excellent - they're loggged in! Let's reset the attempt tracking
+      update app_private.user_secrets
+      set password_attempts = 0, first_failed_password_attempt = null
+      where user_id = v_user.id;
+      return v_user;
+    else
+      -- Wrong password, bump all the attempt tracking figures
+      update app_private.user_secrets
+      set
+        password_attempts = (case when first_failed_password_attempt is null or first_failed_password_attempt < now() - v_login_attempt_window_duration then 1 else password_attempts + 1 end),
+        first_failed_password_attempt = (case when first_failed_password_attempt is null or first_failed_password_attempt < now() - v_login_attempt_window_duration then now() else first_failed_password_attempt end)
+      where user_id = v_user.id;
+      return null;
+    end if;
+  else
+    -- No user with that email/username was found
+    return null;
+  end if;
+end;
+$$ language plpgsql security definer volatile;
+
+--------------------------------------------------------------------------------
+
+create function app_public.reset_password(user_id int, reset_token text, new_password text) returns app_public.users as $$
+declare
+  v_user app_public.users;
+  v_user_secret app_private.user_secrets;
+  v_reset_max_duration interval = interval '3 days';
+begin
+  select users.* into v_user where id = user_id;
+
+  if not (v_user is null) then
+    -- Load their secrets
+    select * into v_user_secret from app_private.user_secrets
+    where user_secrets.user_id = v_user.id;
+
+    -- Have there been too many reset attempts?
+    if (
+      v_user_secret.first_failed_reset_password_attempt is not null
+    and
+      v_user_secret.first_failed_reset_password_attempt > NOW() - v_reset_max_duration
+    and
+      v_user_secret.reset_password_attempts >= 20
+    ) then
+      raise exception 'Password reset locked - too many reset attempts' using errcode = 'LOCKD';
+    end if;
+
+    -- Not too many reset attempts, let's check the token
+    if v_user_secret.reset_password_token = reset_roken then
+      -- Excellent - they're legit; let's reset the password as requested
+      update app_private.user_secrets
+      set
+        password_hash = crypt(new_password, gen_salt('bf')),
+        password_attempts = 0,
+        first_failed_reset_password_attempt = null,
+        reset_password_token = null,
+        reset_password_token_generated = null,
+        reset_password_attempts = 0,
+        first_failed_reset_password_attempt = null
+      where user_id = v_user.id;
+      return v_user;
+    else
+      -- Wrong token, bump all the attempt tracking figures
+      update app_private.user_secrets
+      set
+        reset_password_attempts = (case when first_failed_reset_password_attempt is null or first_failed_reset_password_attempt < now() - v_reset_max_duration then 1 else reset_password_attempts + 1 end),
+        first_failed_reset_password_attempt = (case when first_failed_reset_password_attempt is null or first_failed_reset_password_attempt < now() - v_reset_max_duration then now() else first_failed_reset_password_attempt end)
+      where user_id = v_user.id;
+      return null;
+    end if;
+  else
+    -- No user with that id was found
+    return null;
+  end if;
+end;
+$$ language plpgsql volatile;
+
+--------------------------------------------------------------------------------
+
 create function app_private.register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean default false) returns app_public.users as $$
 declare
   v_user app_public.users;
   v_email citext;
   v_name text;
+  v_username text;
   v_avatar_url text;
   v_user_authentication_id int;
 begin
   -- Insert the user’s public profile data.
   v_email := f_profile ->> 'email';
   v_name := f_profile ->> 'name';
+  v_username := f_profile ->> 'username';
   v_avatar_url := f_profile ->> 'avatar_url';
-  insert into app_public.users (name, avatar_url) values
-    (v_name, v_avatar_url)
+  if v_username is null then
+    v_username = coalesce(v_name, 'user');
+  end if;
+  v_username = regexp_replace(v_username, '^[^a-z]+', '', 'i');
+  v_username = regexp_replace(v_username, '[^a-z0-9]+', '_', 'i');
+  if v_username is null or length(v_username) < 3 then
+    v_username = 'user';
+  end if;
+  select (
+    case
+    when i = 0 then v_username
+    else v_username || i::text
+    end
+  ) into v_username from generate_series(0, 1000) i
+  where not exists(
+    select 1
+    from app_public.users
+    where username = (
+      case
+      when i = 0 then v_username
+      else v_username || i::text
+      end
+    )
+  )
+  limit 1;
+  insert into app_public.users (username, name, avatar_url) values
+    (v_username, v_name, v_avatar_url)
     returning * into v_user;
 
 	-- Add the users email

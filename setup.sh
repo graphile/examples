@@ -127,6 +127,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 SQL
 
 echo "Roles and databases created, now sourcing the initial database schema"
+psql -X1 -v ON_ERROR_STOP=1 graphiledemo -f db/jobs.sql
 psql -X1 -v ON_ERROR_STOP=1 graphiledemo -f db/schema.sql
 # All done
 echo "✅ Setup success"
