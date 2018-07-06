@@ -417,7 +417,8 @@ comment on function app_public.reset_password(user_id int, reset_token text, new
 
 --------------------------------------------------------------------------------
 
-create function app_private.really_create_user(username text, email text, email_is_verified bool, name text, avatar_url text) returns app_public.users as $$
+
+create function app_private.really_create_user(username text, email text, email_is_verified bool, name text, avatar_url text, password text) returns app_public.users as $$
 declare
   v_user app_public.users;
   v_username text = username;
@@ -458,6 +459,13 @@ begin
   if email is not null then
     insert into app_public.user_emails (user_id, email, is_verified)
     values (v_user.id, email, email_is_verified);
+  end if;
+
+  -- Store the password
+  if password is not null then
+    update app_private.user_secrets
+    set password_hash = crypt(password, gen_salt('bf'))
+    where user_id = v_user.id;
   end if;
 
   return v_user;
