@@ -10,7 +10,7 @@ drop schema if exists app_jobs cascade;
 -- Definitions <500 are common to all sorts of applications,
 -- they solve common concerns such as storing user data,
 -- logging people in, triggering password reset emails,
--- avoiding brute force attacks and more.
+-- mitigating brute force attacks and more.
 
 -- Background worker tasks
 \ir 100_jobs.sql

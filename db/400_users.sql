@@ -420,13 +420,11 @@ comment on function app_public.reset_password(user_id int, reset_token text, new
 create function app_private.really_create_user(username text, email text, email_is_verified bool, name text, avatar_url text) returns app_public.users as $$
 declare
   v_user app_public.users;
-  v_email citext = email::citext;
-  v_name text = name;
   v_username text = username;
 begin
   -- Sanitise the username, and make it unique if necessary.
   if v_username is null then
-    v_username = coalesce(v_name, 'user');
+    v_username = coalesce(name, 'user');
   end if;
   v_username = regexp_replace(v_username, '^[^a-z]+', '', 'i');
   v_username = regexp_replace(v_username, '[^a-z0-9]+', '_', 'i');
@@ -442,7 +440,7 @@ begin
   where not exists(
     select 1
     from app_public.users
-    where username = (
+    where users.username = (
       case
       when i = 0 then v_username
       else v_username || i::text
@@ -453,13 +451,13 @@ begin
 
   -- Insert the new user
   insert into app_public.users (username, name, avatar_url) values
-    (v_username, v_name, v_avatar_url)
+    (v_username, name, avatar_url)
     returning * into v_user;
 
 	-- Add the user's email
-  if v_email is not null then
+  if email is not null then
     insert into app_public.user_emails (user_id, email, is_verified)
-    values (v_user.id, v_email, email_is_verified);
+    values (v_user.id, email, email_is_verified);
   end if;
 
   return v_user;
@@ -503,7 +501,7 @@ begin
 
   return v_user;
 end;
-$$ language plpgsql strict volatile security definer set search_path from current;
+$$ language plpgsql volatile security definer set search_path from current;
 
 comment on function app_private.register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean) is
   E'Used to register a user from information gleaned from OAuth. Primarily used by link_or_register_user';
@@ -589,7 +587,7 @@ begin
     end if;
   end if;
 end;
-$$ language plpgsql strict volatile security definer set search_path from current;
+$$ language plpgsql volatile security definer set search_path from current;
 
 comment on function app_private.link_or_register_user(f_user_id integer, f_service character varying, f_identifier character varying, f_profile json, f_auth_details json) is
   E'If you''re logged in, this will link an additional OAuth login to your account if necessary. If you''re logged out it may find if an account already exists (based on OAuth details or email address) and return that, or create a new user account if necessary.';
