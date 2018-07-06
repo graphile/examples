@@ -11,6 +11,9 @@
 -- Security
 -- - all functions should define `set search_path from current` because of `CVE-2018-1058`
 -- - @omit smart comments should not be used for permissions, instead deferring to PostGraphile's RBAC support
+-- - all tables (public or not) should enable RLS
+-- - relevant RLS policy should be defined before granting a permission
+-- - `grant select` should never specify a column list; instead use one-to-one relations as permission boundaries
 
 -- Explicitness
 -- - all functions should explicitly state immutable/stable/volatile
@@ -289,6 +292,8 @@ create trigger _500_insert_secrets
   after insert on app_public.user_emails
   for each row
   execute procedure app_private.tg_user_email_secrets__insert_with_user_email();
+comment on function app_private.tg_user_email_secrets__insert_with_user_email() is
+  E'Ensures that every user_email record has an associated user_email_secret record.';
 
 --------------------------------------------------------------------------------
 
@@ -309,7 +314,7 @@ create trigger _100_timestamps
   execute procedure app_private.tg__update_timestamps();
 
 comment on table app_public.user_authentications is
-  E'@omit create,update,all\nContains information about the login providers this user has used, so that they may disconnect them should they wish.';
+  E'@omit all\nContains information about the login providers this user has used, so that they may disconnect them should they wish.';
 comment on column app_public.user_authentications.user_id is
   E'@omit';
 comment on column app_public.user_authentications.service is
@@ -318,13 +323,9 @@ comment on column app_public.user_authentications.identifier is
   E'A unique identifier for the user within the login service.';
 comment on column app_public.user_authentications.details is
   E'@omit\nAdditional profile details extracted from this login method';
-comment on column app_public.user_authentications.created_at is
-  E'@omit create,update';
-comment on column app_public.user_authentications.updated_at is
-  E'@omit create,update';
 
 create policy select_own on app_public.user_authentications for select using (user_id = app_public.current_user_id());
-create policy delete_own on app_public.user_authentications for delete using (user_id = app_public.current_user_id()); -- TODO check this isn't the last one!
+create policy delete_own on app_public.user_authentications for delete using (user_id = app_public.current_user_id()); -- TODO check this isn't the last one, or that they have a verified email address
 grant select on app_public.user_authentications to graphiledemo_visitor;
 grant delete on app_public.user_authentications to graphiledemo_visitor;
 
@@ -335,6 +336,19 @@ create table app_private.user_authentication_secrets (
   details jsonb not null default '{}'::jsonb
 );
 alter table app_private.user_authentication_secrets enable row level security;
+
+create function app_private.tg_user_authentication_secrets__insert_with_user_authentication() returns trigger as $$
+begin
+  insert into app_private.user_authentication_secrets(user_authentication_id) values(NEW.id);
+  return NEW;
+end;
+$$ language plpgsql volatile set search_path from current;
+create trigger _500_insert_secrets
+  after insert on app_public.user_authentications
+  for each row
+  execute procedure app_private.tg_user_authentication_secrets__insert_with_user_authentication();
+comment on function app_private.tg_user_authentication_secrets__insert_with_user_authentication() is
+  E'Ensures that every user_authentication record has an associated user_authentication_secret record.';
 
 --------------------------------------------------------------------------------
 
@@ -395,7 +409,10 @@ begin
   end if;
   return false;
 end;
-$$ language plpgsql security definer volatile set search_path from current;
+$$ language plpgsql strict security definer volatile set search_path from current;
+
+comment on function app_public.forgot_password(email text) is
+  E'If you''ve forgotten your password, give us one of your email addresses and we'' send you a reset token. Note this only works if you have added an email address!';
 
 --------------------------------------------------------------------------------
 
@@ -458,7 +475,10 @@ begin
     return null;
   end if;
 end;
-$$ language plpgsql security definer volatile set search_path from current;
+$$ language plpgsql strict security definer volatile set search_path from current;
+
+comment on function app_private.login(username text, password text) is
+  E'Returns a user that matches the username/password combo, or null on failure.';
 
 --------------------------------------------------------------------------------
 
@@ -516,7 +536,10 @@ begin
     return null;
   end if;
 end;
-$$ language plpgsql volatile security definer set search_path from current;
+$$ language plpgsql strict volatile security definer set search_path from current;
+
+comment on function app_public.reset_password(user_id int, reset_token text, new_password text) is
+  E'After triggering forgotPassword, you''ll be sent a reset token. Combine this with your user ID and a new password to reset your password.';
 
 --------------------------------------------------------------------------------
 
@@ -577,7 +600,7 @@ begin
 
   return v_user;
 end;
-$$ language plpgsql set search_path from current;
+$$ language plpgsql strict volatile security definer set search_path from current;
 
 --------------------------------------------------------------------------------
 
@@ -655,7 +678,7 @@ begin
     end if;
   end if;
 end;
-$$ language plpgsql set search_path from current;
+$$ language plpgsql strict volatile security definer set search_path from current;
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
