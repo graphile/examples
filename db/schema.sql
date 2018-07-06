@@ -1,84 +1,10 @@
--- Conventions used in this database schema:
---
--- Naming
--- - snake_case for tables, functions, columns (avoids having to put them in quotes in most cases)
--- - plural table names (avoids conflicts with e.g. `user` built ins, is better depluralized by PostGraphile)
--- - trigger functions valid for one table only are named tg_[table_name]__[task_name]
--- - trigger functions valid for many tables are named tg__[task_name]
--- - trigger names should be prefixed with `_NNN_` where NNN is a three digit number that defines the priority of the trigger (use _500_ if unsure)
--- - prefer lowercase over UPPERCASE, except for the `NEW`, `OLD` and `TG_OP` keywords. (This is Benjie's personal preference.)
-
--- Security
--- - all functions should define `set search_path from current` because of `CVE-2018-1058`
--- - @omit smart comments should not be used for permissions, instead deferring to PostGraphile's RBAC support
--- - all tables (public or not) should enable RLS
--- - relevant RLS policy should be defined before granting a permission
--- - `grant select` should never specify a column list; instead use one-to-one relations as permission boundaries
-
--- Explicitness
--- - all functions should explicitly state immutable/stable/volatile
--- - do not override search_path for convenience - prefer to be explicit
-
--- Functions
--- - if a function can be expressed as a single SQL statement it should use the `sql` language if possible. Other functions should use `plpgsql`.
-
--- Relations
--- - all foreign key `references` statements should have `on delete` clauses. Some may also want `on update` clauses, but that's optional
--- - all comments should be defined using '"escape" string constants' - e.g. `E'...'` - because this more easily allows adding smart comments
--- - defining things (primary key, checks, unique constraints, etc) within the `create table` statement is preferable to adding them after
-
--- General conventions (e.g. for PostGraphile compatibility)
--- - avoid plv8 and other extensions that aren't built in because they can be complex for people to install (and this is a demo project)
--- - functions should not use IN/OUT/INOUT parameters
--- - @omit smart comments should be used heavily to remove fields we don't currently need in GraphQL - we can always remove them later
-
--- Definitions
---
---   Please adhere to the following templates (respecting newlines):
---
---     create table <schema_name>.<table_name> (
---       ...
---     );
---
---     create function <fn_name>(<args...>) returns <return_value> as $$
---       select ...
---       from ...
---       inner join ...
---       on ...
---       where ...
---       and ...
---       order by ...
---       limit ...;
---     $$ language sql <strict?> <immutable|stable|volatile> <security definer?> set search_path from current;
-
---     create function <fn_name>(<args...>) returns <return_value> as $$
---     declare
---       v_[varname] <type>[ = <default>];
---       ...
---     begin
---       if ... then
---         ...
---       end if;
---       return <value>;
---     end;
---     $$ language plpgsql <strict?> <immutable|stable|volatile> <security definer?> set search_path from current;
---
---     create trigger _NNN_trigger_name
---       <before|after> <insert|update|delete> on <schema_name>.<table_name>
---       for each row [when (<condition>)]
---       execute procedure <schema_name.function_name>(...);
---
---     comment on <table|column|function|...> <fully.qualified.name> is
---       E'...';
-
-
-
-
-
+-- See CONVENTIONS.md for conventions used in this DB.
 
 -- Erase DB:
 drop schema if exists app_public cascade;
 drop schema if exists app_private cascade;
+
+--------------------------------------------------------------------------------
 
 -- Build DB:
 create schema app_public;
@@ -126,7 +52,7 @@ comment on function  app_public.current_user_id() is
 
 create table app_public.users (
   id serial primary key,
-  username citext not null,
+  username citext not null unique check(username ~ '^[a-zA-Z]([a-zA-Z0-9][_]?)+$'),
   name text,
   avatar_url text check(avatar_url ~ '^https?://[^/]+'),
 	is_admin boolean not null default false,
@@ -134,6 +60,7 @@ create table app_public.users (
   updated_at timestamptz not null default now()
 );
 alter table app_public.users enable row level security;
+
 create trigger _100_timestamps
   after insert or update on app_public.users
   for each row
@@ -145,6 +72,7 @@ create trigger _100_timestamps
 -- users, or enumerate them fully.
 comment on table app_public.users is
   E'@omit all\nA user who can log in to the application.';
+
 comment on column app_public.users.id is
   E'Unique identifier for the user.';
 comment on column app_public.users.username is
@@ -337,18 +265,8 @@ create table app_private.user_authentication_secrets (
 );
 alter table app_private.user_authentication_secrets enable row level security;
 
-create function app_private.tg_user_authentication_secrets__insert_with_user_authentication() returns trigger as $$
-begin
-  insert into app_private.user_authentication_secrets(user_authentication_id) values(NEW.id);
-  return NEW;
-end;
-$$ language plpgsql volatile set search_path from current;
-create trigger _500_insert_secrets
-  after insert on app_public.user_authentications
-  for each row
-  execute procedure app_private.tg_user_authentication_secrets__insert_with_user_authentication();
-comment on function app_private.tg_user_authentication_secrets__insert_with_user_authentication() is
-  E'Ensures that every user_authentication record has an associated user_authentication_secret record.';
+-- NOTE: user_authentication_secrets doesn't need an auto-inserter as we handle
+-- that everywhere that can create a user_authentication row.
 
 --------------------------------------------------------------------------------
 
@@ -543,20 +461,14 @@ comment on function app_public.reset_password(user_id int, reset_token text, new
 
 --------------------------------------------------------------------------------
 
-create function app_private.register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean default false) returns app_public.users as $$
+create function app_private.really_create_user(username text, email text, email_is_verified bool, name text, avatar_url text) returns app_public.users as $$
 declare
   v_user app_public.users;
-  v_email citext;
-  v_name text;
-  v_username text;
-  v_avatar_url text;
-  v_user_authentication_id int;
+  v_email citext = email::citext;
+  v_name text = name;
+  v_username text = username;
 begin
-  -- Insert the user’s public profile data.
-  v_email := f_profile ->> 'email';
-  v_name := f_profile ->> 'name';
-  v_username := f_profile ->> 'username';
-  v_avatar_url := f_profile ->> 'avatar_url';
+  -- Sanitise the username, and make it unique if necessary.
   if v_username is null then
     v_username = coalesce(v_name, 'user');
   end if;
@@ -582,15 +494,50 @@ begin
     )
   )
   limit 1;
+
+  -- Insert the new user
   insert into app_public.users (username, name, avatar_url) values
     (v_username, v_name, v_avatar_url)
     returning * into v_user;
 
-	-- Add the users email
+	-- Add the user's email
   if v_email is not null then
     insert into app_public.user_emails (user_id, email, is_verified)
-    values (v_user.id, v_email, f_verified);
+    values (v_user.id, v_email, email_is_verified);
   end if;
+
+  return v_user;
+end;
+$$ language plpgsql volatile set search_path from current;
+
+comment on function app_private.really_create_user(username text, email text, email_is_verified bool, name text, avatar_url text) is
+  E'Creates a user account. All arguments are optional, it trusts the calling method to perform sanitisation.';
+
+--------------------------------------------------------------------------------
+
+create function app_private.register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean default false) returns app_public.users as $$
+declare
+  v_user app_public.users;
+  v_email citext;
+  v_name text;
+  v_username text;
+  v_avatar_url text;
+  v_user_authentication_id int;
+begin
+  -- Extract data from the user’s OAuth profile data.
+  v_email := f_profile ->> 'email';
+  v_name := f_profile ->> 'name';
+  v_username := f_profile ->> 'username';
+  v_avatar_url := f_profile ->> 'avatar_url';
+
+  -- Create the user account
+  v_user = app_private.really_create_user(
+    username => v_username,
+    email => v_email,
+    email_is_verified => f_email_is_verified,
+    name => v_name,
+    avatar_url => v_avatar_url
+  );
 
   -- Insert the user’s private account data (e.g. OAuth tokens)
   insert into app_public.user_authentications (user_id, service, identifier, details) values
@@ -601,6 +548,9 @@ begin
   return v_user;
 end;
 $$ language plpgsql strict volatile security definer set search_path from current;
+
+comment on function app_private.register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean) is
+  E'Used to register a user from information gleaned from OAuth. Primarily used by link_or_register_user';
 
 --------------------------------------------------------------------------------
 
@@ -620,13 +570,17 @@ declare
   v_user app_public.users;
   v_user_email app_public.user_emails;
 begin
+  -- See if a user account already matches these details
   select id, user_id
     into v_matched_authentication_id, v_matched_user_id
     from app_public.user_authentications
     where service = f_service
     and identifier = f_identifier
-    and (f_user_id is null or user_id = f_user_id)
     limit 1;
+
+  if v_matched_user_id is not null and f_user_id is not null and v_matched_user_id <> f_user_id then
+    raise exception 'A different user already has this account linked.' using errcode='TAKEN';
+  end if;
 
   v_email = f_profile ->> 'email';
   v_name := f_profile ->> 'name';
@@ -652,6 +606,7 @@ begin
     end if;
   end if;
   if v_matched_user_id is null and f_user_id is null and v_matched_authentication_id is null then
+    -- Create and return a new user account
     return app_private.register_user(f_service, f_identifier, f_profile, f_auth_details, true);
   else
     if v_matched_authentication_id is not null then
@@ -680,6 +635,9 @@ begin
 end;
 $$ language plpgsql strict volatile security definer set search_path from current;
 
+comment on function app_private.link_or_register_user(f_user_id integer, f_service character varying, f_identifier character varying, f_profile json, f_auth_details json) is
+  E'If you''re logged in, this will link an additional OAuth login to your account if necessary. If you''re logged out it may find if an account already exists (based on OAuth details or email address) and return that, or create a new user account if necessary.';
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --                                                                            --
@@ -706,18 +664,12 @@ create trigger _100_timestamps
 
 comment on table app_public.forums is
   E'A subject-based grouping of topics and posts.';
-comment on column app_public.forums.id is
-  E'@omit create,update';
 comment on column app_public.forums.slug is
   E'An URL-safe alias for the `Forum`.';
 comment on column app_public.forums.name is
   E'The name of the `Forum` (indicates its subject matter).';
 comment on column app_public.forums.description is
   E'A brief description of the `Forum` including it''s purpose.';
-comment on column app_public.forums.created_at is
-  E'@omit create,update';
-comment on column app_public.forums.updated_at is
-  E'@omit create,update';
 
 create policy select_all on app_public.forums for select using (true);
 create policy insert_admin on app_public.forums for insert with check (app_public.current_user_is_admin());
@@ -747,20 +699,10 @@ create trigger _100_timestamps
 
 comment on table app_public.topics is
   E'@omit all\nAn individual message thread within a Forum.';
-comment on column app_public.topics.id is
-  E'@omit create,update';
-comment on column app_public.topics.forum_id is
-  E'@omit update';
-comment on column app_public.topics.user_id is
-  E'@omit create,update';
 comment on column app_public.topics.title is
   E'The title of the `Topic`.';
 comment on column app_public.topics.body is
   E'The body of the `Topic`, which Posts reply to.';
-comment on column app_public.topics.created_at is
-  E'@omit create,update';
-comment on column app_public.topics.updated_at is
-  E'@omit create,update';
 
 create policy select_all on app_public.topics for select using (true);
 create policy insert_admin on app_public.topics for insert with check (user_id = app_public.current_user_id());
