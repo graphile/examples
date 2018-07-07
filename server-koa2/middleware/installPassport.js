@@ -49,7 +49,7 @@ module.exports = function installPassport(app, { rootPgPool }) {
           let user;
           try {
             const { rows } = await rootPgPool.query(
-              `select * from app_private.link_or_register_user($1, $2, $3, $4, $5) users where users is not null;`,
+              `select * from app_private.link_or_register_user($1, $2, $3, $4, $5) users where not (users is null);`,
               [
                 (req.user && req.user.id) || null,
                 "github",
