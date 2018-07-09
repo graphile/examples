@@ -2,7 +2,7 @@
 
 create table app_public.forums (
   id serial primary key,
-  slug text not null check(length(slug) < 30 and slug ~ '^([a-z0-9]-?)+$'),
+  slug text not null check(length(slug) < 30 and slug ~ '^([a-z0-9]-?)+$') unique,
   name text not null check(length(name) > 0),
   description text not null default '',
   created_at timestamptz not null default now(),
