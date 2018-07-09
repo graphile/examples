@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
 import { Link } from "react-router-dom";
 import ForumItem from "./ForumItem";
+import TopicItem from "./TopicItem";
 import Main from "./Main";
 import CreateNewForumForm from "./CreateNewForumForm";
 
@@ -20,20 +21,14 @@ export default class ForumPage extends React.Component {
         nodeId
         name
         topics{
-          nodes{
-            nodeId
-            id
-            title
-            user {
-              nodeId
-              avatarUrl
-              username
+            nodes{
+              ...TopicItem_TopicFragment
             }
-          }
         }
         ...ForumItem_ForumFragment
       }
     }
+    ${TopicItem.TopicFragment}
     ${ForumItem.ForumFragment}
     ${ForumItem.CurrentUserFragment}
     ${CreateNewForumForm.QueryFragment}
@@ -56,9 +51,9 @@ export default class ForumPage extends React.Component {
       <Main>
         <h1>{forum.name}</h1>
         <div>
-          {/*allForums.nodes.length ? (
-            allForums.nodes.map(node => (
-              <ForumItem
+          {forum.topics.nodes.length ? (
+            forum.topics.nodes.map(node => (
+              <TopicItem
                 key={node.nodeId}
                 forum={node}
                 currentUser={currentUser}
@@ -66,7 +61,7 @@ export default class ForumPage extends React.Component {
             ))
           ) : (
             <div>
-              There are no forums yet!{" "}
+              There are no topics yet!{" "}
               {currentUser ? (
                 currentUser.isAdmin ? (
                   "Create one below..."
@@ -79,7 +74,7 @@ export default class ForumPage extends React.Component {
                 </span>
               )}
             </div>
-          )*/}
+          )}
         </div>
         {currentUser && currentUser.isAdmin ? (
           <div>
