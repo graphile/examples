@@ -3,6 +3,7 @@ import { Switch, Route } from "react-router-dom";
 import HomeRoute from "./routes/HomeRoute";
 import NotFoundRoute from "./routes/NotFoundRoute";
 import LoginRoute from "./routes/LoginRoute";
+import ForumRoute from "./routes/ForumRoute";
 
 class App extends Component {
   render() {
@@ -30,6 +31,7 @@ class App extends Component {
         <Switch>
           <Route path="/" exact component={HomeRoute} />
           <Route path="/login" exact component={LoginRoute} />
+          <Route path="/forums/:slug" exact component={ForumRoute} />
           <Route component={NotFoundRoute} />
         </Switch>
       </div>

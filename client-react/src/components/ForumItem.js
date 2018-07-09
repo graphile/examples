@@ -1,6 +1,7 @@
 import React from "react";
 import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
+import { Link } from "react-router-dom";
 
 export default class ForumItem extends React.Component {
   static ForumFragment = gql`
@@ -9,6 +10,7 @@ export default class ForumItem extends React.Component {
       id
       name
       description
+      slug
     }
   `;
 
@@ -28,7 +30,7 @@ export default class ForumItem extends React.Component {
     const { forum, currentUser } = this.props;
     return (
       <div className="ForumItem">
-        <div className="ForumItem-name">{forum.name}</div>
+        <div className="ForumItem-name"><Link to={`/forums/${forum.slug}`}>{forum.name}</Link></div>
         <div className="ForumItem-description">{forum.description}</div>
         {currentUser && currentUser.isAdmin ? (
           <div className="ForumItem-tools">[edit]</div>
