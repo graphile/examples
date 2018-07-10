@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import ForumItem from "./ForumItem";
 import TopicItem from "./TopicItem";
 import Main from "./Main";
+import NotFound from "./NotFound";
 import CreateNewForumForm from "./CreateNewForumForm";
 
 export default class ForumPage extends React.Component {
@@ -20,10 +21,10 @@ export default class ForumPage extends React.Component {
       forum: forumBySlug(slug: $slug) {
         nodeId
         name
-        topics{
-            nodes{
-              ...TopicItem_TopicFragment
-            }
+        topics {
+          nodes {
+            ...TopicItem_TopicFragment
+          }
         }
         ...ForumItem_ForumFragment
       }
@@ -46,6 +47,9 @@ export default class ForumPage extends React.Component {
     }
     if (error) {
       return <Main>Error {error.message}</Main>;
+    }
+    if (!forum) {
+      return <NotFound />;
     }
     return (
       <Main>
@@ -82,7 +86,7 @@ export default class ForumPage extends React.Component {
             <p>Hello administrator! Would you like to create a new forum?</p>
             <CreateNewForumForm
               data={data}
-              onCreateForum={forum => {
+              onCreateForum={_forum => {
                 // TODO: alter the cache
                 data.refetch();
               }}
