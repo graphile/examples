@@ -2,7 +2,6 @@ import React from "react";
 import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
 import { Link } from "react-router-dom";
-import ForumItem from "./ForumItem";
 
 export default class TopicItem extends React.Component {
   /*static ForumFragment = gql`
@@ -25,6 +24,8 @@ export default class TopicItem extends React.Component {
         avatarUrl
         username
       }
+      createdAt
+      updatedAt
     }
   `;
 
@@ -41,11 +42,17 @@ export default class TopicItem extends React.Component {
 
   render() {
     const { topic } = this.props;
+    const createdDate = topic.createdAt;
+    const updatedDate = topic.updatedAt;
+
     return (
       <div className="TopicItem">
         <div className="TopicItem-title">
           <Link to={`/forums/topic/1`}>{topic.title}</Link>
         </div>
+        <div className="TopicItem-author">{topic.user.username}</div>
+        <div className="TopicItem-created">{createdDate}</div>
+        <div className="TopicItem-updated">{updatedDate}</div>
       </div>
     );
   }

@@ -92,7 +92,7 @@ export default class CreateNewTopicForm extends React.Component {
             <table>
               <tbody>
                 <tr>
-                  <th>Name !!!!!</th>
+                  <th>Topic Name</th>
                   <td>
                     <input
                       type="text"
