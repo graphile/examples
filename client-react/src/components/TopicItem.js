@@ -25,7 +25,8 @@ export default class TopicItem extends React.Component {
         avatarUrl
         username
       }
-    }`;
+    }
+  `;
 
   /*static CurrentUserFragment = gql`
     fragment ForumItem_CurrentUserFragment on User {
@@ -42,7 +43,9 @@ export default class TopicItem extends React.Component {
     const { topic } = this.props;
     return (
       <div className="TopicItem">
-        <div className="TopicItem-title"><Link to={`/forums/topic/1`}>{topic}</Link></div>
+        <div className="TopicItem-title">
+          <Link to={`/forums/topic/1`}>{topic.title}</Link>
+        </div>
       </div>
     );
   }
