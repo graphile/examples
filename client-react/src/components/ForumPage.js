@@ -6,12 +6,12 @@ import ForumItem from "./ForumItem";
 import TopicItem from "./TopicItem";
 import Main from "./Main";
 import NotFound from "./NotFound";
-import CreateNewForumForm from "./CreateNewForumForm";
+import CreateNewTopicForm from "./CreateNewTopicForm";
 
 export default class ForumPage extends React.Component {
   static QueryFragment = gql`
     fragment ForumPage_QueryFragment on Query {
-      ...CreateNewForumForm_QueryFragment
+      ...CreateNewTopicForm_QueryFragment
       currentUser {
         nodeId
         id
@@ -32,7 +32,7 @@ export default class ForumPage extends React.Component {
     ${TopicItem.TopicFragment}
     ${ForumItem.ForumFragment}
     ${ForumItem.CurrentUserFragment}
-    ${CreateNewForumForm.QueryFragment}
+    ${CreateNewTopicForm.QueryFragment}
   `;
 
   static propTypes = {
@@ -59,7 +59,7 @@ export default class ForumPage extends React.Component {
             forum.topics.nodes.map(node => (
               <TopicItem
                 key={node.nodeId}
-                forum={node}
+                topic={node}
                 currentUser={currentUser}
               />
             ))
@@ -80,11 +80,10 @@ export default class ForumPage extends React.Component {
             </div>
           )}
         </div>
-        {currentUser && currentUser.isAdmin ? (
+        {currentUser ? (
           <div>
-            <h2>Create new forum</h2>
-            <p>Hello administrator! Would you like to create a new forum?</p>
-            <CreateNewForumForm
+            <h2>Create new topic</h2>
+            <CreateNewTopicForm
               data={data}
               onCreateForum={_forum => {
                 // TODO: alter the cache
