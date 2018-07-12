@@ -46,7 +46,7 @@ body {
   padding-top: 0;
 }
 
-.ForumItem {
+.ForumItem, .TopicItem{
   background-color: #ccc;
   border: 1px solid #999;
   margin: 1rem 0;
@@ -68,3 +68,4 @@ body {
   color: white;
   padding: 0.5rem;
 }
+

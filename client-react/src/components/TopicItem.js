@@ -46,14 +46,15 @@ export default class TopicItem extends React.Component {
     const updatedDate = topic.updatedAt;
 
     return (
-      <div className="TopicItem">
-        <div className="TopicItem-title">
+      <tr className="TopicItem">
+        <td className="TopicItem-title">
           <Link to={`/forums/topic/1`}>{topic.title}</Link>
-        </div>
-        <div className="TopicItem-author">{topic.user.username}</div>
-        <div className="TopicItem-created">{createdDate}</div>
-        <div className="TopicItem-updated">{updatedDate}</div>
-      </div>
+          <span>
+            Started by {topic.user.username} on {createdDate}
+          </span>
+        </td>
+        <td className="TopicItem-updated">{updatedDate}</td>
+      </tr>
     );
   }
 }

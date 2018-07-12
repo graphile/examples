@@ -54,13 +54,13 @@ export default class ForumPage extends React.Component {
     return (
       <Main>
         <h1>{forum.name}</h1>
-        <div className="Topics-container">
-          <div className="Topics-TopicItemHeader">
-            <div>Topic</div>
-            <div>Author</div>
-            <div>Created At</div>
-            <div>Last Updated</div>
-          </div>
+        <table className="Topics-container">
+          <tr className="Topics-TopicItemHeader">
+            <th>Topic</th>
+            <th>Author</th>
+            <th>Created At</th>
+            <th>Last Updated</th>
+          </tr>
           {forum.topics.nodes.length ? (
             forum.topics.nodes.map(node => (
               <TopicItem
@@ -85,7 +85,7 @@ export default class ForumPage extends React.Component {
               )}
             </div>
           )}
-        </div>
+        </table>
         {currentUser ? (
           <div>
             <h2>Create new topic</h2>
