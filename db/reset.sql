@@ -32,3 +32,5 @@ drop schema if exists app_jobs cascade;
 
 -- Forum tables
 \ir 700_forum.sql
+
+\ir 999_data.sql
