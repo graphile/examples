@@ -54,37 +54,42 @@ export default class ForumPage extends React.Component {
     return (
       <Main>
         <h1>{forum.name}</h1>
+        <span>{forum.description}</span>
         <table className="Topics-container">
-          <tr className="Topics-TopicItemHeader">
-            <th>Topic</th>
-            <th>Author</th>
-            <th>Created At</th>
-            <th>Last Updated</th>
-          </tr>
-          {forum.topics.nodes.length ? (
-            forum.topics.nodes.map(node => (
-              <TopicItem
-                key={node.nodeId}
-                topic={node}
-                currentUser={currentUser}
-              />
-            ))
-          ) : (
-            <div>
-              There are no topics yet!{" "}
-              {currentUser ? (
-                currentUser.isAdmin ? (
-                  "Create one below..."
+          <thead>
+            <tr className="Topics-TopicItemHeader">
+              <th>Topic</th>
+              <th>Author</th>
+              <th>Replies</th>
+              <th>Last post</th>
+            </tr>
+          </thead>
+          <tbody>
+            {forum.topics.nodes.length ? (
+              forum.topics.nodes.map(node => (
+                <TopicItem
+                  key={node.nodeId}
+                  topic={node}
+                  currentUser={currentUser}
+                />
+              ))
+            ) : (
+              <div>
+                There are no topics yet!{" "}
+                {currentUser ? (
+                  currentUser.isAdmin ? (
+                    "Create one below..."
+                  ) : (
+                    "Please check back later or contact an admin."
+                  )
                 ) : (
-                  "Please check back later or contact an admin."
-                )
-              ) : (
-                <span>
-                  Perhaps you need to <Link to="/login">log in</Link>?
-                </span>
-              )}
-            </div>
-          )}
+                  <span>
+                    Perhaps you need to <Link to="/login">log in</Link>?
+                  </span>
+                )}
+              </div>
+            )}
+          </tbody>
         </table>
         {currentUser ? (
           <div>
