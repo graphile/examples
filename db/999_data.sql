@@ -6,7 +6,7 @@ select app_private.link_or_register_user(
   '{}'::json
 );
 insert into app_public.forums(slug, name, description) values
-  ('cat-life', 'Cat Life', ''),
+  ('cat-life', 'Cat Life', 'A forum all about cats and how fluffy they are and how they completely ignore their owners unless there is food. Or yarn.'),
   ('dog-life', 'Dog Life', ''),
   ('slug-life', 'Slug Life', '');
 
