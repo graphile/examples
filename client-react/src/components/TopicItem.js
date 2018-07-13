@@ -51,7 +51,7 @@ export default class TopicItem extends React.Component {
         </td>
         <td className="TopicItem-user">{topic.user.username}</td>
         <td className="TopicItem-replies">10</td>
-        <td className="TopicItem-title">{updatedDate}</td>
+        <td className="TopicItem-date">{updatedDate}</td>
       </tr>
     );
   }
