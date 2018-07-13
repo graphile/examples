@@ -24,7 +24,9 @@ export default class TopicItem extends React.Component {
         avatarUrl
         username
       }
-      createdAt
+      posts {
+        totalCount
+      }
       updatedAt
     }
   `;
@@ -43,6 +45,7 @@ export default class TopicItem extends React.Component {
   render() {
     const { topic } = this.props;
     const updatedDate = topic.updatedAt;
+    const totalCount = topic.posts.totalCount;
 
     return (
       <tr className="TopicItem">
@@ -50,7 +53,7 @@ export default class TopicItem extends React.Component {
           <Link to={`/forums/topic/1`}>{topic.title}</Link>
         </td>
         <td className="TopicItem-user">{topic.user.username}</td>
-        <td className="TopicItem-replies">10</td>
+        <td className="TopicItem-replies">{totalCount}</td>
         <td className="TopicItem-date">{updatedDate}</td>
       </tr>
     );

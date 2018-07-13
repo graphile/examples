@@ -4,6 +4,10 @@ body {
   font-family: sans-serif;
 }
 
+a {
+  text-decoration: none;
+}
+
 .Header {
   background-color: #222;
   color: white;
@@ -71,7 +75,6 @@ body {
 
 .Forum-header {
   margin-bottom: 15px;
-  padding-top: 3px;
   font-size: 2rem;
   line-height: 1.4em;
   background-image: linear-gradient(-90deg, #32a3ff, #013f7b);
@@ -81,6 +84,10 @@ body {
 
 .Forum-description {
   padding: 12px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 15px;
+  color: #919191;
 }
 
 .Topics-container {
@@ -95,14 +102,24 @@ body {
   display: table-row;
 }
 
+.TopicItem a {
+  color: #0074ca;
+}
+
 .TopicItem-title {
-  padding: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: none;
   width: 500px;
 }
 
 .Topics-TopicItemHeader th {
   color: #919191;
   font-weight: normal;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: none;
+  text-align: left;
 }
 
 .Topics-container tbody {
@@ -111,4 +128,6 @@ body {
 
 .TopicItem-user, .TopicItem-replies, TopicItem-date {
   width: 65px;
+  padding-left: none;
+  text-align: left;
 }

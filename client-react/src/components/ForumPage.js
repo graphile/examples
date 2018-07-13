@@ -56,7 +56,7 @@ export default class ForumPage extends React.Component {
         <div className="Forum-header">
           {forum.name}
         </div>
-        <div className="Forum-description">{forum.description}</div>
+        <div className="Forum-description">Welcome to {forum.name}! {forum.description}</div>
         <table className="Topics-container">
           <thead>
             <tr className="Topics-TopicItemHeader">
