@@ -2,6 +2,7 @@ import React from "react";
 import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
 import { Link } from "react-router-dom";
+import moment from "moment";
 
 export default class TopicItem extends React.Component {
   /*static ForumFragment = gql`
@@ -54,7 +55,7 @@ export default class TopicItem extends React.Component {
         </td>
         <td className="TopicItem-user">{topic.user.username}</td>
         <td className="TopicItem-replies">{totalCount}</td>
-        <td className="TopicItem-date">{updatedDate}</td>
+        <td className="TopicItem-date">{moment(updatedDate).calendar()}</td>
       </tr>
     );
   }
