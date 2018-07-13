@@ -69,8 +69,25 @@ body {
   padding: 0.5rem;
 }
 
+.Forum-header {
+  margin-bottom: 15px;
+  padding-top: 3px;
+  font-size: 2rem;
+  line-height: 1.4em;
+  background-image: linear-gradient(-90deg, #32a3ff, #013f7b);
+  color: white;
+  padding: 12px;
+}
+
+.Forum-description {
+  padding: 12px;
+}
+
 .Topics-container {
   border-collapse: collapse;
+  max-width: 1110px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .TopicItem {
@@ -80,6 +97,7 @@ body {
 
 .TopicItem-title {
   padding: 12px;
+  width: 500px;
 }
 
 .Topics-TopicItemHeader th {
@@ -89,4 +107,8 @@ body {
 
 .Topics-container tbody {
   border-top: 3px solid #e9e9e9;
+}
+
+.TopicItem-user, .TopicItem-replies, TopicItem-date {
+  width: 65px;
 }
