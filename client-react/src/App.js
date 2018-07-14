@@ -7,10 +7,15 @@ import ForumRoute from "./routes/ForumRoute";
 
 class App extends Component {
   render() {
-    if (typeof window !== "undefined" && window.location.port == 8350) {
+    if (typeof window !== "undefined" && window.location.port === "8350") {
       return (
         <div>
-          <h1>Greetings and saluations! 🧐</h1>
+          <h1>
+            Greetings and saluations!{" "}
+            <span role="img" aria-label="A smiley face shown wearing a monocle">
+              🧐
+            </span>
+          </h1>
           <p>
             Terribly sorry about this old bean, but you appear to have visited
             the create-react-app app directly.
