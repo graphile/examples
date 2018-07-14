@@ -8,9 +8,13 @@ import PropTypes from "prop-types";
 const autoSlug = str => _slug(str, _slug.defaults.modes["rfc3986"]);
 
 const CreateTopicMutation = gql`
-  mutation CreateTopicMutation($title: String!, $body: String, $forumId: Int!) {
+  mutation CreateTopicMutation(
+    $name: String!
+    $description: String
+    $forumId: Int!
+  ) {
     createTopic(
-      input: { topic: { title: $title, body: $body, forumId: $forumId } }
+      input: { topic: { title: $name, body: $description, forumId: $forumId } }
     ) {
       topic {
         nodeId
@@ -34,13 +38,13 @@ export default class CreateNewTopicForm extends React.Component {
 
   static propTypes = {
     data: propType(CreateNewTopicForm.QueryFragment),
-    onCreateTopic: PropTypes.func,
+    onCreateTopic: PropTypes.func
   };
 
   state = {
     slug: null,
     name: "",
-    description: "",
+    description: ""
   };
 
   handleChange = key => e => {
@@ -49,15 +53,15 @@ export default class CreateNewTopicForm extends React.Component {
 
   handleSuccess = ({
     data: {
-      createTopic: { forum },
-    },
+      createTopic: { forum }
+    }
   }) => {
     console.dir(forum);
     this.setState({
       sending: false,
       slug: null,
       name: "",
-      description: "",
+      description: ""
     });
     if (typeof this.props.onCreateTopic === "function") {
       this.props.onCreateTopic(forum);
@@ -72,6 +76,8 @@ export default class CreateNewTopicForm extends React.Component {
     this.state.slug != null ? this.state.slug : autoSlug(this.state.name);
 
   render() {
+    const { data } = this.props;
+    const { forum } = data;
     return (
       <Mutation mutation={CreateTopicMutation}>
         {createNewMutation => (
@@ -85,7 +91,8 @@ export default class CreateNewTopicForm extends React.Component {
                   slug: this.slug(),
                   name: this.state.name,
                   description: this.state.description,
-                },
+                  forumId: forum.id
+                }
               }).then(this.handleSuccess, this.handleError);
             }}
           >
