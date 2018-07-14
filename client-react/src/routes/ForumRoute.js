@@ -15,13 +15,20 @@ const ForumQuery = gql`
 
 export default class ForumRoute extends React.Component {
   render() {
-    console.log(this.props)
-    const {params:{slug}} = this.props.match
+    console.log(this.props);
+    const {
+      params: { slug }
+    } = this.props.match;
     return (
-      <Query query={ForumQuery} variables={{slug}}>
-        {({ loading, error, data }) => (
+      <Query query={ForumQuery} variables={{ slug }}>
+        {({ loading, error, refetch, data }) => (
           <StandardLayout
-            data={{ ...data, loading, error }}
+            data={{
+              ...data,
+              loading,
+              error,
+              refetch
+            }}
             bodyComponent={ForumPage}
           />
         )}

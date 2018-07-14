@@ -36,7 +36,7 @@ export default class ForumPage extends React.Component {
   `;
 
   static propTypes = {
-    data: propType(ForumPage.QueryFragment),
+    data: propType(ForumPage.QueryFragment)
   };
 
   render() {
@@ -53,10 +53,10 @@ export default class ForumPage extends React.Component {
     }
     return (
       <Main>
-        <div className="Forum-header">
-          {forum.name}
+        <div className="Forum-header">{forum.name}</div>
+        <div className="Forum-description">
+          Welcome to {forum.name}! {forum.description}
         </div>
-        <div className="Forum-description">Welcome to {forum.name}! {forum.description}</div>
         <table className="Topics-container">
           <thead>
             <tr className="Topics-TopicItemHeader">
@@ -98,7 +98,7 @@ export default class ForumPage extends React.Component {
             <h2>Create new topic</h2>
             <CreateNewTopicForm
               data={data}
-              onCreateForum={_forum => {
+              onCreateTopic={forum => {
                 // TODO: alter the cache
                 data.refetch();
               }}
