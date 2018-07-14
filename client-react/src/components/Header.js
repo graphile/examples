@@ -18,7 +18,7 @@ export default class Header extends React.Component {
   static propTypes = {
     user: propType(Header.UserFragment),
     loading: PropTypes.bool,
-    error: PropTypes.object,
+    error: PropTypes.object
   };
 
   renderUser() {
@@ -44,8 +44,10 @@ export default class Header extends React.Component {
     return (
       <header className="Header">
         <div className="Header-titleContainer">
-          <img src={logo} className="Header-logo" alt="logo" />
-          <span className="Header-title">PostGraphile Forum Demo</span>
+          <Link to="/">
+            <img src={logo} className="Header-logo" alt="logo" />
+            <span className="Header-title">PostGraphile Forum Demo</span>
+          </Link>
         </div>
         <div>{this.renderUser()}</div>
       </header>
