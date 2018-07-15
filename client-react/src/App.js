@@ -4,6 +4,7 @@ import HomeRoute from "./routes/HomeRoute";
 import NotFoundRoute from "./routes/NotFoundRoute";
 import LoginRoute from "./routes/LoginRoute";
 import ForumRoute from "./routes/ForumRoute";
+import TopicRoute from "./routes/TopicRoute";
 
 class App extends Component {
   render() {
@@ -37,6 +38,7 @@ class App extends Component {
           <Route path="/" exact component={HomeRoute} />
           <Route path="/login" exact component={LoginRoute} />
           <Route path="/forums/:slug" exact component={ForumRoute} />
+          <Route path="/forums/:slug/:topic" exact component={TopicRoute} />
           <Route component={NotFoundRoute} />
         </Switch>
       </div>

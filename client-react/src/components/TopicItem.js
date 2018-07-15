@@ -39,19 +39,19 @@ export default class TopicItem extends React.Component {
     }`;*/
 
   static propTypes = {
-    topic: propType(TopicItem.TopicFragment),
+    topic: propType(TopicItem.TopicFragment)
     /*currentUser: propType(ForumItem.CurrentUserFragment),*/
   };
 
   render() {
-    const { topic } = this.props;
+    const { topic, forum } = this.props;
     const updatedDate = topic.updatedAt;
     const totalCount = topic.posts.totalCount;
 
     return (
       <tr className="TopicItem">
         <td className="TopicItem-title">
-          <Link to={`/forums/topic/1`}>{topic.title}</Link>
+          <Link to={`/forums/${forum.slug}/${topic.id}`}>{topic.title}</Link>
         </td>
         <td className="TopicItem-user">{topic.user.username}</td>
         <td className="TopicItem-replies">{totalCount}</td>

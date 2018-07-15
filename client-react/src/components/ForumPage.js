@@ -72,6 +72,7 @@ export default class ForumPage extends React.Component {
                 <TopicItem
                   key={node.nodeId}
                   topic={node}
+                  forum={forum}
                   currentUser={currentUser}
                 />
               ))
