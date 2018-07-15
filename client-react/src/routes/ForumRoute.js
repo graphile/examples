@@ -15,7 +15,6 @@ const ForumQuery = gql`
 
 export default class ForumRoute extends React.Component {
   render() {
-    console.log(this.props);
     const {
       params: { slug }
     } = this.props.match;
