@@ -22,6 +22,7 @@ export default class TopicPage extends React.Component {
       }
       topic: topicById(id: $topic) {
         ...TopicItem_TopicFragment
+        createdAt
         forum {
           name
           slug
@@ -61,19 +62,19 @@ export default class TopicPage extends React.Component {
         <div className="Forum-header">
           <Link to={`/forums/${topic.forum.slug}/`}>{topic.forum.name}</Link>
         </div>
-        <div className="Topic-header">
+        <h1 className="Topic-header">
           {topic.title}
-        </div>
+        </h1>
         <section className="Posts-container">
-          <article className="PostItem">
-          <header>
-            <h2 className="PostItem-user">{topic.user.username}</h2>
-            <time className="PostItem-date">
-              {moment(topic.updatedDate).calendar()}
-            </time>
-          </header>
-          <p className="PostItem-body">{topic.body}</p>
-        </article>
+          <article className="PostItem-topic">
+            <div className="PostItem-meta">
+              <div className="PostItem-user">{topic.user.username}</div>
+              <time className="PostItem-date">
+                {moment(topic.createdAt).calendar()}
+              </time>
+            </div>
+            <p className="PostItem-body">{topic.body}</p>
+          </article>
           {topic.posts.nodes.length ? (
             topic.posts.nodes.map(node => (
               <PostItem
@@ -84,7 +85,7 @@ export default class TopicPage extends React.Component {
             ))
           ) : (
             <div>
-              There are no posts yet!{" "}
+              There are no replies yet!{" "}
               {currentUser ? (
                 currentUser.isAdmin ? (
                   "Create one below..."

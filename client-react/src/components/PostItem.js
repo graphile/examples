@@ -24,16 +24,16 @@ export default class PostItem extends React.Component {
 
   render() {
     const { post } = this.props;
-    const updatedDate = post.updatedAt;
+    const createdDate = post.createdAt;
 
     return (
       <article className="PostItem">
-        <header>
-          <h2 className="PostItem-user">{post.user.username}</h2>
+        <div className="PostItem-meta">
+          <div className="PostItem-user">{post.user.username}</div>
           <time className="PostItem-date">
-            {moment(updatedDate).calendar()}
+            {moment(createdDate).calendar()}
           </time>
-        </header>
+        </div>
         <p className="PostItem-body">{post.body}</p>
       </article>
     );
