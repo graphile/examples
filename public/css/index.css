@@ -82,6 +82,10 @@ a {
   padding: 12px;
 }
 
+.Forum-header a {
+  color: white;
+}
+
 .Forum-description {
   padding: 12px;
   margin-left: auto;
@@ -130,4 +134,24 @@ a {
   width: 65px;
   padding-left: none;
   text-align: left;
+}
+
+.Posts-container{
+
+}
+
+.PostItem{
+
+}
+
+.PostItem-user{
+  font-weight: bold;
+}
+
+.PostItem-date{
+  color: #919191;
+}
+
+.PostItem-body{
+
 }

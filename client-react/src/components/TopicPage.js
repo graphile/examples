@@ -22,6 +22,10 @@ export default class TopicPage extends React.Component {
       }
       topic: topicById(id: $topic) {
         ...TopicItem_TopicFragment
+        forum {
+          name
+          slug
+        }
         posts {
           nodes {
             ...PostItem_PostFragment
@@ -42,6 +46,7 @@ export default class TopicPage extends React.Component {
   render() {
     const { data } = this.props;
     const { loading, error, currentUser, topic } = data;
+
     if (loading) {
       return <Main>Loading...</Main>;
     }
@@ -53,9 +58,11 @@ export default class TopicPage extends React.Component {
     }
     return (
       <Main>
-        <h1 className="Topic-header">{topic.title}</h1>
-        <div className="Topic-description">
-          Welcome to {topic.title}! {topic.description}
+        <div className="Forum-header">
+          <Link to={`/forums/${topic.forum.slug}/`}>{topic.forum.name}</Link>
+        </div>
+        <div className="Topic-header">
+          {topic.title}
         </div>
         <section className="Posts-container">
           <article className="PostItem">
