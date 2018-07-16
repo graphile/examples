@@ -8,6 +8,7 @@ import Main from "./Main";
 import NotFound from "./NotFound";
 import CreateNewPostForm from "./CreateNewPostForm";
 import ForumItem from "./ForumItem";
+import moment from "moment";
 
 export default class TopicPage extends React.Component {
   static QueryFragment = gql`
@@ -57,6 +58,15 @@ export default class TopicPage extends React.Component {
           Welcome to {topic.title}! {topic.description}
         </div>
         <section className="Posts-container">
+          <article className="PostItem">
+          <header>
+            <h2 className="PostItem-user">{topic.user.username}</h2>
+            <time className="PostItem-date">
+              {moment(topic.updatedDate).calendar()}
+            </time>
+          </header>
+          <p className="PostItem-body">{topic.body}</p>
+        </article>
           {topic.posts.nodes.length ? (
             topic.posts.nodes.map(node => (
               <PostItem

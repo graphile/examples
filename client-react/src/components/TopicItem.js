@@ -20,6 +20,7 @@ export default class TopicItem extends React.Component {
       nodeId
       id
       title
+      body
       user {
         nodeId
         avatarUrl
