@@ -30,7 +30,7 @@ export default class ForumItem extends React.Component {
     const { forum, currentUser } = this.props;
     return (
       <div className="ForumItem">
-        <div className="ForumItem-name"><Link to={`/forums/${forum.slug}`}>{forum.name}</Link></div>
+        <h1 className="ForumItem-name"><Link to={`/forums/${forum.slug}`}>{forum.name}</Link></h1>
         <div className="ForumItem-description">{forum.description}</div>
         {currentUser && currentUser.isAdmin ? (
           <div className="ForumItem-tools">[edit]</div>
