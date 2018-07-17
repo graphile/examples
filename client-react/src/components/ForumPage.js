@@ -77,20 +77,22 @@ export default class ForumPage extends React.Component {
                 />
               ))
             ) : (
-              <div>
-                There are no topics yet!{" "}
-                {currentUser ? (
-                  currentUser.isAdmin ? (
-                    "Create one below..."
+              <tr>
+                <td>
+                  There are no topics yet!{" "}
+                  {currentUser ? (
+                    currentUser.isAdmin ? (
+                      "Create one below..."
+                    ) : (
+                      "Please check back later or contact an admin."
+                    )
                   ) : (
-                    "Please check back later or contact an admin."
-                  )
-                ) : (
-                  <span>
-                    Perhaps you need to <Link to="/login">log in</Link>?
-                  </span>
-                )}
-              </div>
+                    <span>
+                      Perhaps you need to <Link to="/login">log in</Link>?
+                    </span>
+                  )}
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
