@@ -23,15 +23,19 @@ export default class ForumItem extends React.Component {
 
   static propTypes = {
     forum: propType(ForumItem.ForumFragment),
-    currentUser: propType(ForumItem.CurrentUserFragment),
+    currentUser: propType(ForumItem.CurrentUserFragment)
   };
 
   render() {
     const { forum, currentUser } = this.props;
     return (
       <div className="ForumItem">
-        <h1 className="ForumItem-name"><Link to={`/forums/${forum.slug}`}>{forum.name}</Link></h1>
-        <div className="ForumItem-description">{forum.description}</div>
+        <h1 className="ForumItem-name">
+          <Link to={`/forums/${forum.slug}`}>{forum.name}</Link>
+        </h1>
+        {forum.description && (
+          <div className="ForumItem-description">{forum.description}</div>
+        )}
         {currentUser && currentUser.isAdmin ? (
           <div className="ForumItem-tools">[edit]</div>
         ) : null}
