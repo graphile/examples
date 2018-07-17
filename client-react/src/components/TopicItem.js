@@ -24,7 +24,7 @@ export default class TopicItem extends React.Component {
       user {
         nodeId
         avatarUrl
-        username
+        name
       }
       posts {
         totalCount
@@ -54,7 +54,7 @@ export default class TopicItem extends React.Component {
         <td className="TopicItem-title">
           <Link to={`/forums/${forum.slug}/${topic.id}`}>{topic.title}</Link>
         </td>
-        <td className="TopicItem-user">{topic.user.username}</td>
+        <td className="TopicItem-user">{topic.user.name}</td>
         <td className="TopicItem-replies">{totalCount}</td>
         <td className="TopicItem-date">{moment(updatedDate).calendar()}</td>
       </tr>

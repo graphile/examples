@@ -13,7 +13,7 @@ export default class PostItem extends React.Component {
       user {
         id
         avatarUrl
-        username
+        name
       }
     }
   `;
@@ -29,7 +29,7 @@ export default class PostItem extends React.Component {
     return (
       <article className="PostItem">
         <div className="PostItem-meta">
-          <div className="PostItem-user">{post.user.username}</div>
+          <div className="PostItem-user">{post.user.name}</div>
           <time className="PostItem-date">
             {moment(createdDate).calendar()}
           </time>

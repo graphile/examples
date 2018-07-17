@@ -62,13 +62,11 @@ export default class TopicPage extends React.Component {
         <div className="Forum-header">
           <Link to={`/forums/${topic.forum.slug}/`}>{topic.forum.name}</Link>
         </div>
-        <h1 className="Topic-header">
-          {topic.title}
-        </h1>
+        <h1 className="Topic-header">{topic.title}</h1>
         <section className="Posts-container">
           <article className="PostItem-topic">
             <div className="PostItem-meta">
-              <div className="PostItem-user">{topic.user.username}</div>
+              <div className="PostItem-user">{topic.user.name}</div>
               <time className="PostItem-date">
                 {moment(topic.createdAt).calendar()}
               </time>
