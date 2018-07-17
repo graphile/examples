@@ -104,7 +104,7 @@ a {
   display: table-row;
 }
 
-.TopicItem a {
+.TopicItem a, .WelcomeMessage a {
   color: #0074ca;
 }
 
