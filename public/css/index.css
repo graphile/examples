@@ -166,6 +166,17 @@ a {
   font-weight: bold;
 }
 
+.PostItem-user--with-avatar {
+    display: flex;
+    flex-direction: column;
+}
+
+.PostItem-avatar {
+    max-width: 50px;
+    max-height: 50px;
+    margin-bottom: .5em;
+}
+
 .PostItem-date {
   color: #919191;
   font-size: 0.8em;

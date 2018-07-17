@@ -1,7 +1,7 @@
 import React from "react";
 import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
-import moment from "moment";
+import Reply from "./presentational/Reply";
 
 export default class PostItem extends React.Component {
   static PostFragment = gql`
@@ -24,18 +24,7 @@ export default class PostItem extends React.Component {
 
   render() {
     const { post } = this.props;
-    const createdDate = post.createdAt;
 
-    return (
-      <article className="PostItem">
-        <div className="PostItem-meta">
-          <div className="PostItem-user">{post.user.name}</div>
-          <time className="PostItem-date">
-            {moment(createdDate).calendar()}
-          </time>
-        </div>
-        <p className="PostItem-body">{post.body}</p>
-      </article>
-    );
+    return <Reply {...post} />;
   }
 }

@@ -4,11 +4,11 @@ import { propType } from "graphql-anywhere";
 import { Link } from "react-router-dom";
 import TopicItem from "./TopicItem";
 import PostItem from "./PostItem";
+import Reply from "./presentational/Reply";
 import Main from "./Main";
 import NotFound from "./NotFound";
 import CreateNewPostForm from "./CreateNewPostForm";
 import ForumItem from "./ForumItem";
-import moment from "moment";
 
 export default class TopicPage extends React.Component {
   static QueryFragment = gql`
@@ -64,15 +64,7 @@ export default class TopicPage extends React.Component {
         </div>
         <h1 className="Topic-header">{topic.title}</h1>
         <section className="Posts-container">
-          <article className="PostItem-topic">
-            <div className="PostItem-meta">
-              <div className="PostItem-user">{topic.user.name}</div>
-              <time className="PostItem-date">
-                {moment(topic.createdAt).calendar()}
-              </time>
-            </div>
-            <p className="PostItem-body">{topic.body}</p>
-          </article>
+          <Reply {...topic} />
           {topic.posts.nodes.length ? (
             topic.posts.nodes.map(node => (
               <PostItem
