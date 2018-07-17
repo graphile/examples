@@ -7,13 +7,13 @@ import PostItem from "./PostItem";
 import Reply from "./presentational/Reply";
 import Main from "./Main";
 import NotFound from "./NotFound";
-import CreateNewPostForm from "./CreateNewPostForm";
+import CreateNewReplyForm from "./CreateNewReplyForm";
 import ForumItem from "./ForumItem";
 
 export default class TopicPage extends React.Component {
   static QueryFragment = gql`
     fragment TopicPage_QueryFragment on Query {
-      ...CreateNewPostForm_QueryFragment
+      ...CreateNewReplyForm_QueryFragment
       currentUser {
         nodeId
         id
@@ -37,7 +37,7 @@ export default class TopicPage extends React.Component {
     ${TopicItem.TopicFragment}
     ${PostItem.PostFragment}
     ${ForumItem.CurrentUserFragment}
-    ${CreateNewPostForm.QueryFragment}
+    ${CreateNewReplyForm.QueryFragment}
   `;
 
   static propTypes = {
@@ -92,8 +92,8 @@ export default class TopicPage extends React.Component {
         </section>
         {currentUser ? (
           <div>
-            <h2>Post to this topic</h2>
-            <CreateNewPostForm
+            <h2>Reply to this topic</h2>
+            <CreateNewReplyForm
               data={data}
               onCreatePost={post => {
                 // TODO: alter the cache

@@ -17,9 +17,9 @@ const CreatePostMutation = gql`
   }
 `;
 
-export default class CreateNewPostForm extends React.Component {
+export default class CreateNewReplyForm extends React.Component {
   static QueryFragment = gql`
-    fragment CreateNewPostForm_QueryFragment on Query {
+    fragment CreateNewReplyForm_QueryFragment on Query {
       currentUser {
         nodeId
       }
@@ -27,7 +27,7 @@ export default class CreateNewPostForm extends React.Component {
   `;
 
   static propTypes = {
-    data: propType(CreateNewPostForm.QueryFragment),
+    data: propType(CreateNewReplyForm.QueryFragment),
     onCreatePost: PropTypes.func
   };
 
@@ -96,7 +96,7 @@ export default class CreateNewPostForm extends React.Component {
               </p>
             ) : null}
             <button disabled={this.state.sending} type="submit">
-              Create Post
+              Submit
             </button>
           </form>
         )}
