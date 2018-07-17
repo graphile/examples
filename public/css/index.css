@@ -154,6 +154,10 @@ a {
   max-width: 1000px;
 }
 
+.PostItem {
+    padding: 1em 0;
+}
+
 .PostItem-meta {
   min-width: 200px;
 }
