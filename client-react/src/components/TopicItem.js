@@ -5,16 +5,6 @@ import { Link } from "react-router-dom";
 import moment from "moment";
 
 export default class TopicItem extends React.Component {
-  /*static ForumFragment = gql`
-    fragment ForumItem_ForumFragment on Forum {
-      nodeId
-      id
-      name
-      description
-      slug
-    }
-  `;*/
-
   static TopicFragment = gql`
     fragment TopicItem_TopicFragment on Topic {
       nodeId
@@ -33,15 +23,8 @@ export default class TopicItem extends React.Component {
     }
   `;
 
-  /*static CurrentUserFragment = gql`
-    fragment ForumItem_CurrentUserFragment on User {
-      nodeId
-      isAdmin
-    }`;*/
-
   static propTypes = {
     topic: propType(TopicItem.TopicFragment)
-    /*currentUser: propType(ForumItem.CurrentUserFragment),*/
   };
 
   render() {
