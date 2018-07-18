@@ -1,8 +1,8 @@
 const { postgraphile } = require("postgraphile");
-const PgSimplifyInflectorPlugin = require("@graphile-contrib/pg-simplify-inflector");
 const PassportLoginPlugin = require("../../shared/plugins/PassportLoginPlugin");
-
-const isDev = process.env.NODE_ENV === "development";
+const {
+  library: { connection, schema, options },
+} = require("../../.postgraphilerc.js");
 
 module.exports = function installPostGraphile(app, { rootPgPool }) {
   app.use((ctx, next) => {
@@ -12,20 +12,14 @@ module.exports = function installPostGraphile(app, { rootPgPool }) {
   });
 
   app.use(
-    postgraphile(process.env.AUTH_DATABASE_URL, "app_public", {
-      // Send back JSON objects rather than JSON strings
-      dynamicJson: true,
+    postgraphile(connection, schema, {
+      // Import our shared options
+      ...options,
 
-      // Enable GraphiQL interface
-      graphiql: true,
-
-      // Watch the database for changes
-      watchPg: isDev,
-
-      // Add some Graphile-Build plugins to enhance our GraphQL schema
+      // Since we're using sessions we'll also want our login plugin
       appendPlugins: [
-        // Removes the 'ByFooIdAndBarId' from the end of relations
-        PgSimplifyInflectorPlugin,
+        // All the plugins in our shared config
+        ...(options.appendPlugins || []),
 
         // Adds the `login` mutation to enable users to log in
         PassportLoginPlugin,

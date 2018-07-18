@@ -20,6 +20,9 @@ else
 
   # This is our '.env' config file, we're writing it now so that if something goes wrong we won't lose the passwords.
   cat >> .env <<CONFIG
+# This is a development environment (production wouldn't write envvars to a file)
+export NODE_ENV="development"
+
 # Password for the 'graphiledemo' user, which owns the database
 export SUPERUSER_PASSWORD="$SUPERUSER_PASSWORD"
 
