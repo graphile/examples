@@ -1,7 +1,8 @@
 import React from "react";
 import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
-import Topic from "./presentational/Topic";
+import { Link } from "react-router-dom";
+import moment from "moment";
 
 export default class TopicItem extends React.Component {
   static TopicFragment = gql`
@@ -29,6 +30,15 @@ export default class TopicItem extends React.Component {
   render() {
     const { topic, forum } = this.props;
 
-    return <Topic {...topic} slug={forum.slug} />;
+    return (
+      <tr className="TopicItem">
+        <td className="TopicItem-title">
+          <Link to={`/forums/${forum.slug}/${topic.id}`}>{topic.title}</Link>
+        </td>
+        <td className="TopicItem-user">{topic.user.name}</td>
+        <td className="TopicItem-replies">{topic.posts.totalCount}</td>
+        <td className="TopicItem-date">{moment(topic.updatedAt).calendar()}</td>
+      </tr>
+    );
   }
 }
