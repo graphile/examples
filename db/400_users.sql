@@ -417,16 +417,15 @@ comment on function app_public.reset_password(user_id int, reset_token text, new
 
 --------------------------------------------------------------------------------
 
-create function app_private.really_create_user(username text, email text, email_is_verified bool, name text, avatar_url text) returns app_public.users as $$
+
+create function app_private.really_create_user(username text, email text, email_is_verified bool, name text, avatar_url text, password text default null) returns app_public.users as $$
 declare
   v_user app_public.users;
-  v_email citext = email::citext;
-  v_name text = name;
   v_username text = username;
 begin
   -- Sanitise the username, and make it unique if necessary.
   if v_username is null then
-    v_username = coalesce(v_name, 'user');
+    v_username = coalesce(name, 'user');
   end if;
   v_username = regexp_replace(v_username, '^[^a-z]+', '', 'i');
   v_username = regexp_replace(v_username, '[^a-z0-9]+', '_', 'i');
@@ -442,7 +441,7 @@ begin
   where not exists(
     select 1
     from app_public.users
-    where username = (
+    where users.username = (
       case
       when i = 0 then v_username
       else v_username || i::text
@@ -453,20 +452,27 @@ begin
 
   -- Insert the new user
   insert into app_public.users (username, name, avatar_url) values
-    (v_username, v_name, v_avatar_url)
+    (v_username, name, avatar_url)
     returning * into v_user;
 
 	-- Add the user's email
-  if v_email is not null then
+  if email is not null then
     insert into app_public.user_emails (user_id, email, is_verified)
-    values (v_user.id, v_email, email_is_verified);
+    values (v_user.id, email, email_is_verified);
+  end if;
+
+  -- Store the password
+  if password is not null then
+    update app_private.user_secrets
+    set password_hash = crypt(password, gen_salt('bf'))
+    where user_id = v_user.id;
   end if;
 
   return v_user;
 end;
 $$ language plpgsql volatile set search_path from current;
 
-comment on function app_private.really_create_user(username text, email text, email_is_verified bool, name text, avatar_url text) is
+comment on function app_private.really_create_user(username text, email text, email_is_verified bool, name text, avatar_url text, password text) is
   E'Creates a user account. All arguments are optional, it trusts the calling method to perform sanitisation.';
 
 --------------------------------------------------------------------------------
@@ -503,7 +509,7 @@ begin
 
   return v_user;
 end;
-$$ language plpgsql strict volatile security definer set search_path from current;
+$$ language plpgsql volatile security definer set search_path from current;
 
 comment on function app_private.register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean) is
   E'Used to register a user from information gleaned from OAuth. Primarily used by link_or_register_user';
@@ -589,122 +595,8 @@ begin
     end if;
   end if;
 end;
-$$ language plpgsql strict volatile security definer set search_path from current;
+$$ language plpgsql volatile security definer set search_path from current;
 
 comment on function app_private.link_or_register_user(f_user_id integer, f_service character varying, f_identifier character varying, f_profile json, f_auth_details json) is
   E'If you''re logged in, this will link an additional OAuth login to your account if necessary. If you''re logged out it may find if an account already exists (based on OAuth details or email address) and return that, or create a new user account if necessary.';
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---                                                                            --
---                    END OF COMMON APPLICATION SETUP                         --
---                                                                            --
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
--- Forum example
-
-create table app_public.forums (
-  id serial primary key,
-  slug text not null check(length(slug) < 30 and slug ~ '^([a-z0-9]-?)+$'),
-  name text not null check(length(name) > 0),
-	description text not null default '',
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-alter table app_public.forums enable row level security;
-create trigger _100_timestamps
-  after insert or update on app_public.forums
-  for each row
-  execute procedure app_private.tg__update_timestamps();
-
-comment on table app_public.forums is
-  E'A subject-based grouping of topics and posts.';
-comment on column app_public.forums.slug is
-  E'An URL-safe alias for the `Forum`.';
-comment on column app_public.forums.name is
-  E'The name of the `Forum` (indicates its subject matter).';
-comment on column app_public.forums.description is
-  E'A brief description of the `Forum` including it''s purpose.';
-
-create policy select_all on app_public.forums for select using (true);
-create policy insert_admin on app_public.forums for insert with check (app_public.current_user_is_admin());
-create policy update_admin on app_public.forums for update using (app_public.current_user_is_admin());
-create policy delete_admin on app_public.forums for delete using (app_public.current_user_is_admin());
-grant select on app_public.forums to graphiledemo_visitor;
-grant insert(slug, name, description) on app_public.forums to graphiledemo_visitor;
-grant update(slug, name, description) on app_public.forums to graphiledemo_visitor;
-grant delete on app_public.forums to graphiledemo_visitor;
-
---------------------------------------------------------------------------------
-
-create table app_public.topics (
-  id serial primary key,
-  forum_id int not null references app_public.forums on delete cascade,
-  user_id int not null default app_public.current_user_id() references app_public.users on delete cascade,
-  title text not null check(length(title) > 0),
-	body text not null default '',
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-alter table app_public.topics enable row level security;
-create trigger _100_timestamps
-  after insert or update on app_public.topics
-  for each row
-  execute procedure app_private.tg__update_timestamps();
-
-comment on table app_public.topics is
-  E'@omit all\nAn individual message thread within a Forum.';
-comment on column app_public.topics.title is
-  E'The title of the `Topic`.';
-comment on column app_public.topics.body is
-  E'The body of the `Topic`, which Posts reply to.';
-
-create policy select_all on app_public.topics for select using (true);
-create policy insert_admin on app_public.topics for insert with check (user_id = app_public.current_user_id());
-create policy update_admin on app_public.topics for update using (user_id = app_public.current_user_id() or app_public.current_user_is_admin());
-create policy delete_admin on app_public.topics for delete using (user_id = app_public.current_user_id() or app_public.current_user_is_admin());
-grant select on app_public.topics to graphiledemo_visitor;
-grant insert(forum_id, title, body) on app_public.topics to graphiledemo_visitor;
-grant update(title, body) on app_public.topics to graphiledemo_visitor;
-grant delete on app_public.topics to graphiledemo_visitor;
-
---------------------------------------------------------------------------------
-
-create table app_public.posts (
-  id serial primary key,
-  topic_id int not null references app_public.topics on delete cascade,
-  user_id int not null default app_public.current_user_id() references app_public.users on delete cascade,
-	body text not null default '',
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-alter table app_public.posts enable row level security;
-create trigger _100_timestamps
-  after insert or update on app_public.posts
-  for each row
-  execute procedure app_private.tg__update_timestamps();
-
-comment on table app_public.posts is
-  E'@omit all\nAn individual message thread within a Forum.';
-comment on column app_public.posts.id is
-  E'@omit create,update';
-comment on column app_public.posts.topic_id is
-  E'@omit update';
-comment on column app_public.posts.user_id is
-  E'@omit create,update';
-comment on column app_public.posts.body is
-  E'The body of the `Topic`, which Posts reply to.';
-comment on column app_public.posts.created_at is
-  E'@omit create,update';
-comment on column app_public.posts.updated_at is
-  E'@omit create,update';
-
-create policy select_all on app_public.posts for select using (true);
-create policy insert_admin on app_public.posts for insert with check (user_id = app_public.current_user_id());
-create policy update_admin on app_public.posts for update using (user_id = app_public.current_user_id() or app_public.current_user_is_admin());
-create policy delete_admin on app_public.posts for delete using (user_id = app_public.current_user_id() or app_public.current_user_is_admin());
-grant select on app_public.posts to graphiledemo_visitor;
-grant insert(topic_id, body) on app_public.posts to graphiledemo_visitor;
-grant update(body) on app_public.posts to graphiledemo_visitor;
-grant delete on app_public.posts to graphiledemo_visitor;

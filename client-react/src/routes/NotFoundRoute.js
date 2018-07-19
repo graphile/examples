@@ -11,12 +11,15 @@ const NotFoundRouteQuery = gql`
   ${StandardLayout.QueryFragment},
 `;
 
-export default class HomeRoute extends React.Component {
+export default class NotFoundRoute extends React.Component {
   render() {
     return (
       <Query query={NotFoundRouteQuery}>
-        {graphql => (
-          <StandardLayout graphql={graphql} bodyComponent={NotFound} />
+        {({ loading, error, data }) => (
+          <StandardLayout
+            data={{ ...data, loading, error }}
+            bodyComponent={NotFound}
+          />
         )}
       </Query>
     );

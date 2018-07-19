@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-set -x
 export NODE_ENV=development
 
 if [ -x .env ]; then
@@ -13,6 +12,7 @@ if [ -x .env ]; then
     echo ".env already exists, but it doesn't define AUTH_USER_PASSWORD - aborting!"
     exit 1;
   fi
+  echo "Configuration already exists, using existing secrets."
 else
   # This will generate passwords that are safe to use in envvars without needing to be escaped:
   SUPERUSER_PASSWORD="$(openssl rand -base64 30 | tr '+/' '-_')"
@@ -20,38 +20,74 @@ else
 
   # This is our '.env' config file, we're writing it now so that if something goes wrong we won't lose the passwords.
   cat >> .env <<CONFIG
+# This is a development environment (production wouldn't write envvars to a file)
+export NODE_ENV="development"
+
+# Password for the 'graphiledemo' user, which owns the database
 export SUPERUSER_PASSWORD="$SUPERUSER_PASSWORD"
+
+# Password for the 'graphiledemo_authenticator' user, which has very limited
+# privileges, but can switch into graphiledemo_visitor
 export AUTH_USER_PASSWORD="$AUTH_USER_PASSWORD"
+
+# This secret is used for signing cookies
 export SECRET="$(openssl rand -base64 48)"
+
+# This secret is used for signing JWT tokens (we don't use this by default)
 export JWT_SECRET="$(openssl rand -base64 48)"
+
+
+# These are the connection strings for the DB and the test DB.
 export ROOT_DATABASE_URL="postgresql://graphiledemo:\$SUPERUSER_PASSWORD@localhost/graphiledemo"
 export AUTH_DATABASE_URL="postgresql://graphiledemo_authenticator:\$AUTH_USER_PASSWORD@localhost/graphiledemo"
 export TEST_ROOT_DATABASE_URL="postgresql://graphiledemo:\$SUPERUSER_PASSWORD@localhost/graphiledemo_test"
 export TEST_AUTH_DATABASE_URL="postgresql://graphiledemo_authenticator:\$AUTH_USER_PASSWORD@localhost/graphiledemo_test"
+
 # This port is the one you'll connect to
 export PORT=8349
+
 # This is the port that create-react-app runs as, don't connect to it directly
 export CLIENT_PORT=8350
+
+# This is needed any time we use absolute URLs, e.g. for OAuth callback URLs
 export ROOT_DOMAIN="localhost:\$PORT"
 export ROOT_URL="http://\$ROOT_DOMAIN"
+
+# Our session store uses redis
 export REDIS_URL="redis://localhost/3"
 
-# Create an application, then add the secrets below https://github.com/settings/applications/new
-# Name: GraphileDemo
-# Homepage URL: http://localhost:8349
-# Authorization callback URL: http://localhost:8349/auth/github/callback
+# Create a GitHub application, by visiting
+# https://github.com/settings/applications/new and then enter the Client
+# ID/Secret below
+#
+#   Name: GraphileDemo
+#   Homepage URL: http://localhost:8349
+#   Authorization callback URL: http://localhost:8349/auth/github/callback
+#
 # Client ID:
 export GITHUB_KEY=""
 # Client Secret:
 export GITHUB_SECRET=""
 CONFIG
+  echo "Passwords generated and configuration written to .env"
 
   # To source our .env file from the shell it has to be executable.
   chmod +x .env
 fi
 
-# Now we'll create the roles, databases and extensions in PostgreSQL:
+echo "Installing or reinstalling the roles and database..."
+# Now we can reset the database
 psql -X -v ON_ERROR_STOP=1 template1 <<SQL
+-- RESET database
+DROP DATABASE IF EXISTS graphiledemo;
+DROP DATABASE IF EXISTS graphiledemo_test;
+DROP ROLE IF EXISTS graphiledemo_visitor;
+DROP ROLE IF EXISTS graphiledemo_admin;
+DROP ROLE IF EXISTS graphiledemo_authenticator;
+DROP ROLE IF EXISTS graphiledemo;
+
+-- Now to set up the database cleanly:
+
 -- Ref: https://devcenter.heroku.com/articles/heroku-postgresql#connection-permissions
 
 -- This is the root role for the database
@@ -93,6 +129,7 @@ CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 SQL
 
+echo "Roles and databases created, now sourcing the initial database schema"
+psql -X1 -v ON_ERROR_STOP=1 graphiledemo -f db/reset.sql
 # All done
 echo "✅ Setup success"
-psql -X1 -v ON_ERROR_STOP=1 graphiledemo -f db/schema.sql

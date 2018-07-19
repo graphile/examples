@@ -2,6 +2,14 @@ const passport = require("koa-passport");
 const route = require("koa-route");
 const { Strategy: GitHubStrategy } = require("passport-github");
 
+/*
+ * This file uses regular Passport.js authentication, both for
+ * username/password and for login with GitHub. You can easily add more OAuth
+ * providers to this file. For more information, see:
+ *
+ *   http://www.passportjs.org/
+ */
+
 module.exports = function installPassport(app, { rootPgPool }) {
   passport.serializeUser((user, done) => {
     done(null, user.id);
@@ -11,15 +19,13 @@ module.exports = function installPassport(app, { rootPgPool }) {
     let error = null;
     let user;
     try {
-      const { rows } = await rootPgPool.query(
+      const {
+        rows: [_user],
+      } = await rootPgPool.query(
         `select users.* from app_public.users where users.id = $1`,
         [id]
       );
-      if (!rows.length) {
-        user = false;
-      } else {
-        user = rows[0];
-      }
+      user = _user || false;
     } catch (e) {
       error = e;
     } finally {
@@ -28,6 +34,7 @@ module.exports = function installPassport(app, { rootPgPool }) {
   });
   app.use(passport.initialize());
   app.use(passport.session());
+
   if (process.env.GITHUB_KEY && process.env.GITHUB_SECRET) {
     passport.use(
       new GitHubStrategy(
@@ -42,7 +49,7 @@ module.exports = function installPassport(app, { rootPgPool }) {
           let user;
           try {
             const { rows } = await rootPgPool.query(
-              `select * from app_private.link_or_register_user($1, $2, $3, $4, $5);`,
+              `select * from app_private.link_or_register_user($1, $2, $3, $4, $5) users where not (users is null);`,
               [
                 (req.user && req.user.id) || null,
                 "github",
