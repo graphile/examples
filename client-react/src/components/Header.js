@@ -18,7 +18,7 @@ export default class Header extends React.Component {
   static propTypes = {
     user: propType(Header.UserFragment),
     loading: PropTypes.bool,
-    error: PropTypes.object
+    error: PropTypes.object,
   };
 
   renderUser() {

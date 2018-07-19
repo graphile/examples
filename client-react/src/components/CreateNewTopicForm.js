@@ -38,13 +38,13 @@ export default class CreateNewTopicForm extends React.Component {
 
   static propTypes = {
     data: propType(CreateNewTopicForm.QueryFragment),
-    onCreateTopic: PropTypes.func
+    onCreateTopic: PropTypes.func,
   };
 
   state = {
     slug: null,
     name: "",
-    description: ""
+    description: "",
   };
 
   handleChange = key => e => {
@@ -53,15 +53,15 @@ export default class CreateNewTopicForm extends React.Component {
 
   handleSuccess = ({
     data: {
-      createTopic: { forum }
-    }
+      createTopic: { forum },
+    },
   }) => {
     console.dir(forum);
     this.setState({
       sending: false,
       slug: null,
       name: "",
-      description: ""
+      description: "",
     });
     if (typeof this.props.onCreateTopic === "function") {
       this.props.onCreateTopic(forum);
@@ -91,8 +91,8 @@ export default class CreateNewTopicForm extends React.Component {
                   slug: this.slug(),
                   name: this.state.name,
                   description: this.state.description,
-                  forumId: forum.id
-                }
+                  forumId: forum.id,
+                },
               }).then(this.handleSuccess, this.handleError);
             }}
           >

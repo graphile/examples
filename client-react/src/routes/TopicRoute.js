@@ -17,7 +17,7 @@ export default class TopicRoute extends React.Component {
   render() {
     console.log(this.props);
     const {
-      params: { topic }
+      params: { topic },
     } = this.props.match;
     return (
       <Query query={TopicQuery} variables={{ topic }}>
@@ -27,7 +27,7 @@ export default class TopicRoute extends React.Component {
               ...data,
               loading,
               error,
-              refetch
+              refetch,
             }}
             bodyComponent={TopicPage}
           />

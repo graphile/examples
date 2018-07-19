@@ -41,7 +41,7 @@ export default class TopicPage extends React.Component {
   `;
 
   static propTypes = {
-    data: propType(TopicPage.QueryFragment)
+    data: propType(TopicPage.QueryFragment),
   };
 
   render() {

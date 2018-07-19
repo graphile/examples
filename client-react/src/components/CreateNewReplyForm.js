@@ -28,11 +28,11 @@ export default class CreateNewReplyForm extends React.Component {
 
   static propTypes = {
     data: propType(CreateNewReplyForm.QueryFragment),
-    onCreatePost: PropTypes.func
+    onCreatePost: PropTypes.func,
   };
 
   state = {
-    body: ""
+    body: "",
   };
 
   handleChange = key => e => {
@@ -41,12 +41,12 @@ export default class CreateNewReplyForm extends React.Component {
 
   handleSuccess = ({
     data: {
-      createPost: { forum }
-    }
+      createPost: { forum },
+    },
   }) => {
     this.setState({
       sending: false,
-      body: ""
+      body: "",
     });
     if (typeof this.props.onCreatePost === "function") {
       this.props.onCreatePost(forum);
@@ -71,8 +71,8 @@ export default class CreateNewReplyForm extends React.Component {
               createNewMutation({
                 variables: {
                   body: this.state.body,
-                  topicId: topic.id
-                }
+                  topicId: topic.id,
+                },
               }).then(this.handleSuccess, this.handleError);
             }}
           >

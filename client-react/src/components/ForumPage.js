@@ -36,7 +36,7 @@ export default class ForumPage extends React.Component {
   `;
 
   static propTypes = {
-    data: propType(ForumPage.QueryFragment)
+    data: propType(ForumPage.QueryFragment),
   };
 
   render() {

@@ -23,7 +23,7 @@ export default class ForumItem extends React.Component {
 
   static propTypes = {
     forum: propType(ForumItem.ForumFragment),
-    currentUser: propType(ForumItem.CurrentUserFragment)
+    currentUser: propType(ForumItem.CurrentUserFragment),
   };
 
   render() {

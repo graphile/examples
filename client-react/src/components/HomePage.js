@@ -44,7 +44,15 @@ export default class HomePage extends React.Component {
     return (
       <Main>
         <h1>Welcome</h1>
-        <p className="WelcomeMessage">Welcome to the PostGraphile forum demo. Here you can see how we have harnessed the power of PostGraphile to quickly and easily make a simple forum. <Link to="https://www.graphile.org/postgraphile/postgresql-schema-design/">Take a look at the PostGraphile documentation</Link> to see how to get started with your own forum schema design.</p>
+        <p className="WelcomeMessage">
+          Welcome to the PostGraphile forum demo. Here you can see how we have
+          harnessed the power of PostGraphile to quickly and easily make a
+          simple forum.{" "}
+          <Link to="https://www.graphile.org/postgraphile/postgresql-schema-design/">
+            Take a look at the PostGraphile documentation
+          </Link>{" "}
+          to see how to get started with your own forum schema design.
+        </p>
         <h1>Forum List</h1>
         <div className="HomePage-forums">
           {allForums.nodes.length ? (

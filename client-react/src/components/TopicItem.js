@@ -24,7 +24,7 @@ export default class TopicItem extends React.Component {
   `;
 
   static propTypes = {
-    topic: propType(TopicItem.TopicFragment)
+    topic: propType(TopicItem.TopicFragment),
   };
 
   render() {

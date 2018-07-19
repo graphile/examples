@@ -19,7 +19,7 @@ export default class PostItem extends React.Component {
   `;
 
   static propTypes = {
-    post: propType(PostItem.PostFragment)
+    post: propType(PostItem.PostFragment),
   };
 
   render() {
