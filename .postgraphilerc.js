@@ -38,14 +38,16 @@ module.exports = {
     connection,
     schema,
     options: {
-      graphiql,
       dynamicJson,
+      graphiql,
       watch,
       appendPlugins,
     },
   },
   // Options for the CLI:
   options: {
+    connection,
+    schema,
     dynamicJson,
     disableGraphiql: !graphiql,
     watchPg: watch,

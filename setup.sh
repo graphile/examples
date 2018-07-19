@@ -73,7 +73,10 @@ CONFIG
 
   # To source our .env file from the shell it has to be executable.
   chmod +x .env
+
+  . ./.env
 fi
+
 
 echo "Installing or reinstalling the roles and database..."
 # Now we can reset the database
@@ -130,6 +133,13 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 SQL
 
 echo "Roles and databases created, now sourcing the initial database schema"
-psql -X1 -v ON_ERROR_STOP=1 graphiledemo -f db/reset.sql
+psql -X1 -v ON_ERROR_STOP=1 "${ROOT_DATABASE_URL}" -f db/reset.sql
+
+echo "Dumping full SQL schema to data/schema.sql"
+./scripts/schema_dump
+
+echo "Exporting GraphQL schema to data/schema.graphql and data/schema.json"
+yarn postgraphile -X --export-schema-graphql data/schema.graphql --export-schema-json data/schema.json
+
 # All done
 echo "✅ Setup success"

@@ -7,12 +7,13 @@ can use in your own applications (after a find and replace for 'graphiledemo'!)
 so when you start, jump straight to the files >= 500 as they contain the forum
 application logic.
 
-Note also that this application works with both social (OAuth) login, and with
-traditional username/password login, and the social login stores your access
-tokens so that the server-side may use them (e.g. to look up issues in GitHub
-when they're mentioned in one of your posts). This means the user tables might
-be more complex than your application requires. I'll be building a much simpler
-example application soon too.
+Note also that this application works with both social (OAuth) login (when used
+with a server that supports this), and with traditional username/password
+login, and the social login stores your access tokens so that the server-side
+may use them (e.g. to look up issues in GitHub when they're mentioned in one of
+your posts). This means the user tables might be significantly more complex
+than your application requires; feel free to simplify them when you build your
+own schema.
 
 ### Conventions
 
@@ -46,3 +47,12 @@ application, and dealing with concerns such as a welcome email or customising
 the user tables to your whim. We use them here to add our forum-specific logic.
 
 `700_forum.sql`
+
+### Migrations
+
+This project doesn't currently deal with migrations. Every time you pull down a
+new version you should reset your database; we do not (currently) care about
+supporting legacy versions of this example repo. There are many projects that
+help you deal with migrations, two of note are [sqitch](https://sqitch.org/)
+and
+[db-migrate](https://db-migrate.readthedocs.io/en/latest/Getting%20Started/usage/).
