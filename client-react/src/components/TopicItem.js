@@ -37,7 +37,7 @@ export default class TopicItem extends React.Component {
         <td className="TopicItem-title">
           <Link to={`/forums/${forum.slug}/${topic.id}`}>{topic.title}</Link>
         </td>
-        <td className="TopicItem-user">{topic.user.name}</td>
+        <td className="TopicItem-user">{topic.user.name || "anonymous"}</td>
         <td className="TopicItem-replies">{topic.posts.totalCount}</td>
         <td className="TopicItem-date">{moment(topic.updatedAt).calendar()}</td>
       </tr>

@@ -9,6 +9,7 @@ import NotFound from "./NotFound";
 import CreateNewReplyForm from "./CreateNewReplyForm";
 import ForumItem from "./ForumItem";
 import moment from "moment";
+import logo from "../logo.svg";
 
 export default class TopicPage extends React.Component {
   static QueryFragment = gql`
@@ -23,6 +24,11 @@ export default class TopicPage extends React.Component {
       topic: topicById(id: $topic) {
         ...TopicItem_TopicFragment
         createdAt
+        user: author {
+          id
+          avatarUrl
+          name
+        }
         forum {
           name
           slug
@@ -69,9 +75,9 @@ export default class TopicPage extends React.Component {
               <img
                 alt=""
                 className="PostItem-avatar"
-                src={topic.user.avatarUrl}
+                src={topic.user.avatarUrl || logo}
               />
-              {topic.user.name}
+              {topic.user.name || "anonymous"}
             </div>
             <div>
               <time className="PostItem-date">

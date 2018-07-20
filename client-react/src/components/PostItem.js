@@ -2,6 +2,7 @@ import React from "react";
 import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
 import moment from "moment";
+import logo from "../logo.svg";
 
 export default class PostItem extends React.Component {
   static PostFragment = gql`
@@ -25,12 +26,14 @@ export default class PostItem extends React.Component {
   render() {
     const { post } = this.props;
     const { user, createdAt, body } = post;
+    const avatar = user.avatarUrl || logo;
+    const username = user.name || "anonymous";
 
     return (
       <article className="PostItem">
         <div className="PostItem-meta PostItem-user PostItem-user--with-avatar">
-          <img alt="" className="PostItem-avatar" src={user.avatarUrl} />
-          {user.name}
+          <img alt="" className="PostItem-avatar" src={avatar} />
+          {username}
         </div>
         <div>
           <time className="PostItem-date">{moment(createdAt).calendar()}</time>
