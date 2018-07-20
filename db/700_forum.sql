@@ -65,6 +65,22 @@ grant insert(forum_id, title, body) on app_public.topics to graphiledemo_visitor
 grant update(title, body) on app_public.topics to graphiledemo_visitor;
 grant delete on app_public.topics to graphiledemo_visitor;
 
+create function app_public.topics_body_summary(
+  t app_public.topics,
+  max_length int = 30
+)
+returns text
+language sql
+stable
+set search_path from current
+as $$
+  select case
+    when length(t.body) > max_length
+    then left(t.body, max_length - 3) || '...'
+    else t.body
+    end;
+$$;
+
 --------------------------------------------------------------------------------
 
 create table app_public.posts (

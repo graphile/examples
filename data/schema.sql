@@ -975,6 +975,60 @@ COMMENT ON FUNCTION app_public.reset_password(user_id integer, reset_token text,
 
 
 --
+-- Name: topics; Type: TABLE; Schema: app_public; Owner: -
+--
+
+CREATE TABLE app_public.topics (
+    id integer NOT NULL,
+    forum_id integer NOT NULL,
+    user_id integer DEFAULT app_public.current_user_id() NOT NULL,
+    title text NOT NULL,
+    body text DEFAULT ''::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT topics_title_check CHECK ((length(title) > 0))
+);
+
+
+--
+-- Name: TABLE topics; Type: COMMENT; Schema: app_public; Owner: -
+--
+
+COMMENT ON TABLE app_public.topics IS '@omit all
+An individual message thread within a Forum.';
+
+
+--
+-- Name: COLUMN topics.title; Type: COMMENT; Schema: app_public; Owner: -
+--
+
+COMMENT ON COLUMN app_public.topics.title IS 'The title of the `Topic`.';
+
+
+--
+-- Name: COLUMN topics.body; Type: COMMENT; Schema: app_public; Owner: -
+--
+
+COMMENT ON COLUMN app_public.topics.body IS 'The body of the `Topic`, which Posts reply to.';
+
+
+--
+-- Name: topics_body_summary(app_public.topics, integer); Type: FUNCTION; Schema: app_public; Owner: -
+--
+
+CREATE FUNCTION app_public.topics_body_summary(t app_public.topics, max_length integer DEFAULT 30) RETURNS text
+    LANGUAGE sql STABLE
+    SET search_path TO "$user", public
+    AS $$
+  select case
+    when length(t.body) > max_length
+    then left(t.body, max_length - 3) || '...'
+    else t.body
+    end;
+$$;
+
+
+--
 -- Name: job_queues; Type: TABLE; Schema: app_jobs; Owner: -
 --
 
@@ -1210,44 +1264,6 @@ CREATE SEQUENCE app_public.posts_id_seq
 --
 
 ALTER SEQUENCE app_public.posts_id_seq OWNED BY app_public.posts.id;
-
-
---
--- Name: topics; Type: TABLE; Schema: app_public; Owner: -
---
-
-CREATE TABLE app_public.topics (
-    id integer NOT NULL,
-    forum_id integer NOT NULL,
-    user_id integer DEFAULT app_public.current_user_id() NOT NULL,
-    title text NOT NULL,
-    body text DEFAULT ''::text NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT topics_title_check CHECK ((length(title) > 0))
-);
-
-
---
--- Name: TABLE topics; Type: COMMENT; Schema: app_public; Owner: -
---
-
-COMMENT ON TABLE app_public.topics IS '@omit all
-An individual message thread within a Forum.';
-
-
---
--- Name: COLUMN topics.title; Type: COMMENT; Schema: app_public; Owner: -
---
-
-COMMENT ON COLUMN app_public.topics.title IS 'The title of the `Topic`.';
-
-
---
--- Name: COLUMN topics.body; Type: COMMENT; Schema: app_public; Owner: -
---
-
-COMMENT ON COLUMN app_public.topics.body IS 'The body of the `Topic`, which Posts reply to.';
 
 
 --
@@ -1988,6 +2004,34 @@ GRANT UPDATE(avatar_url) ON TABLE app_public.users TO graphiledemo_visitor;
 
 
 --
+-- Name: TABLE topics; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT SELECT,DELETE ON TABLE app_public.topics TO graphiledemo_visitor;
+
+
+--
+-- Name: COLUMN topics.forum_id; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT INSERT(forum_id) ON TABLE app_public.topics TO graphiledemo_visitor;
+
+
+--
+-- Name: COLUMN topics.title; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT INSERT(title),UPDATE(title) ON TABLE app_public.topics TO graphiledemo_visitor;
+
+
+--
+-- Name: COLUMN topics.body; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT INSERT(body),UPDATE(body) ON TABLE app_public.topics TO graphiledemo_visitor;
+
+
+--
 -- Name: TABLE forums; Type: ACL; Schema: app_public; Owner: -
 --
 
@@ -2048,34 +2092,6 @@ GRANT INSERT(body),UPDATE(body) ON TABLE app_public.posts TO graphiledemo_visito
 --
 
 GRANT SELECT,USAGE ON SEQUENCE app_public.posts_id_seq TO graphiledemo_visitor;
-
-
---
--- Name: TABLE topics; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT SELECT,DELETE ON TABLE app_public.topics TO graphiledemo_visitor;
-
-
---
--- Name: COLUMN topics.forum_id; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT INSERT(forum_id) ON TABLE app_public.topics TO graphiledemo_visitor;
-
-
---
--- Name: COLUMN topics.title; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT INSERT(title),UPDATE(title) ON TABLE app_public.topics TO graphiledemo_visitor;
-
-
---
--- Name: COLUMN topics.body; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT INSERT(body),UPDATE(body) ON TABLE app_public.topics TO graphiledemo_visitor;
 
 
 --
