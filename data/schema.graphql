@@ -1144,6 +1144,9 @@ type Query implements Node {
   userByUsername(username: String!): User
   currentUser: User
 
+  """Chosen by fair dice roll. Guaranteed to be random. XKCD#221"""
+  randomNumber: Int
+
   """Reads a single `Forum` using its globally unique `ID`."""
   forum(
     """The globally unique `ID` to be used in selecting a single `Forum`."""

@@ -475,6 +475,18 @@
               "deprecationReason": null
             },
             {
+              "name": "randomNumber",
+              "description": "Chosen by fair dice roll. Guaranteed to be random. XKCD#221",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "forum",
               "description": "Reads a single `Forum` using its globally unique `ID`.",
               "args": [

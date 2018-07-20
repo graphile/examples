@@ -904,6 +904,24 @@ If you''ve forgotten your password, give us one of your email addresses and we''
 
 
 --
+-- Name: random_number(); Type: FUNCTION; Schema: app_public; Owner: -
+--
+
+CREATE FUNCTION app_public.random_number() RETURNS integer
+    LANGUAGE sql STABLE
+    AS $$
+  select 4;
+$$;
+
+
+--
+-- Name: FUNCTION random_number(); Type: COMMENT; Schema: app_public; Owner: -
+--
+
+COMMENT ON FUNCTION app_public.random_number() IS 'Chosen by fair dice roll. Guaranteed to be random. XKCD#221';
+
+
+--
 -- Name: reset_password(integer, text, text); Type: FUNCTION; Schema: app_public; Owner: -
 --
 

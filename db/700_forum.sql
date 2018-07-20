@@ -120,3 +120,13 @@ grant select on app_public.posts to graphiledemo_visitor;
 grant insert(topic_id, body) on app_public.posts to graphiledemo_visitor;
 grant update(body) on app_public.posts to graphiledemo_visitor;
 grant delete on app_public.posts to graphiledemo_visitor;
+
+
+create function app_public.random_number() returns int
+language sql stable
+as $$
+  select 4;
+$$;
+
+comment on function app_public.random_number()
+  is 'Chosen by fair dice roll. Guaranteed to be random. XKCD#221';
