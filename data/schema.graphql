@@ -987,7 +987,7 @@ type Post implements Node {
   nodeId: ID!
   id: Int!
   topicId: Int!
-  userId: Int!
+  authorId: Int!
 
   """The body of the `Topic`, which Posts reply to."""
   body: String!
@@ -1011,8 +1011,8 @@ input PostCondition {
   """Checks for equality with the object’s `topicId` field."""
   topicId: Int
 
-  """Checks for equality with the object’s `userId` field."""
-  userId: Int
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
 
   """Checks for equality with the object’s `body` field."""
   body: String
@@ -1073,8 +1073,8 @@ enum PostsOrderBy {
   ID_DESC
   TOPIC_ID_ASC
   TOPIC_ID_DESC
-  USER_ID_ASC
-  USER_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
   BODY_ASC
   BODY_DESC
   CREATED_AT_ASC
@@ -1250,7 +1250,7 @@ type Topic implements Node {
   nodeId: ID!
   id: Int!
   forumId: Int!
-  userId: Int!
+  authorId: Int!
 
   """The title of the `Topic`."""
   title: String!
@@ -1307,8 +1307,8 @@ input TopicCondition {
   """Checks for equality with the object’s `forumId` field."""
   forumId: Int
 
-  """Checks for equality with the object’s `userId` field."""
-  userId: Int
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
 
   """Checks for equality with the object’s `title` field."""
   title: String
@@ -1378,8 +1378,8 @@ enum TopicsOrderBy {
   ID_DESC
   FORUM_ID_ASC
   FORUM_ID_DESC
-  USER_ID_ASC
-  USER_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
   TITLE_ASC
   TITLE_DESC
   BODY_ASC

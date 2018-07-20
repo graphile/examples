@@ -1054,7 +1054,7 @@ COMMENT ON FUNCTION app_public.reset_password(user_id integer, reset_token text,
 CREATE TABLE app_public.topics (
     id integer NOT NULL,
     forum_id integer NOT NULL,
-    user_id integer DEFAULT app_public.current_user_id() NOT NULL,
+    author_id integer DEFAULT app_public.current_user_id() NOT NULL,
     title text NOT NULL,
     body text DEFAULT ''::text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
@@ -1218,7 +1218,7 @@ ALTER SEQUENCE app_public.forums_id_seq OWNED BY app_public.forums.id;
 CREATE TABLE app_public.posts (
     id integer NOT NULL,
     topic_id integer NOT NULL,
-    user_id integer DEFAULT app_public.current_user_id() NOT NULL,
+    author_id integer DEFAULT app_public.current_user_id() NOT NULL,
     body text DEFAULT ''::text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
@@ -1248,10 +1248,10 @@ COMMENT ON COLUMN app_public.posts.topic_id IS '@omit update';
 
 
 --
--- Name: COLUMN posts.user_id; Type: COMMENT; Schema: app_public; Owner: -
+-- Name: COLUMN posts.author_id; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN app_public.posts.user_id IS '@omit create,update';
+COMMENT ON COLUMN app_public.posts.author_id IS '@omit create,update';
 
 
 --
@@ -1763,6 +1763,14 @@ ALTER TABLE ONLY app_private.user_secrets
 
 
 --
+-- Name: posts posts_author_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
+--
+
+ALTER TABLE ONLY app_public.posts
+    ADD CONSTRAINT posts_author_id_fkey FOREIGN KEY (author_id) REFERENCES app_public.users(id) ON DELETE CASCADE;
+
+
+--
 -- Name: posts posts_topic_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
 --
 
@@ -1771,11 +1779,11 @@ ALTER TABLE ONLY app_public.posts
 
 
 --
--- Name: posts posts_user_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
+-- Name: topics topics_author_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY app_public.posts
-    ADD CONSTRAINT posts_user_id_fkey FOREIGN KEY (user_id) REFERENCES app_public.users(id) ON DELETE CASCADE;
+ALTER TABLE ONLY app_public.topics
+    ADD CONSTRAINT topics_author_id_fkey FOREIGN KEY (author_id) REFERENCES app_public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -1784,14 +1792,6 @@ ALTER TABLE ONLY app_public.posts
 
 ALTER TABLE ONLY app_public.topics
     ADD CONSTRAINT topics_forum_id_fkey FOREIGN KEY (forum_id) REFERENCES app_public.forums(id) ON DELETE CASCADE;
-
-
---
--- Name: topics topics_user_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
---
-
-ALTER TABLE ONLY app_public.topics
-    ADD CONSTRAINT topics_user_id_fkey FOREIGN KEY (user_id) REFERENCES app_public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -1839,14 +1839,14 @@ CREATE POLICY delete_admin ON app_public.forums FOR DELETE USING (app_public.cur
 -- Name: topics delete_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY delete_admin ON app_public.topics FOR DELETE USING (((user_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
+CREATE POLICY delete_admin ON app_public.topics FOR DELETE USING (((author_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
 
 
 --
 -- Name: posts delete_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY delete_admin ON app_public.posts FOR DELETE USING (((user_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
+CREATE POLICY delete_admin ON app_public.posts FOR DELETE USING (((author_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
 
 
 --
@@ -1887,14 +1887,14 @@ CREATE POLICY insert_admin ON app_public.forums FOR INSERT WITH CHECK (app_publi
 -- Name: topics insert_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY insert_admin ON app_public.topics FOR INSERT WITH CHECK ((user_id = app_public.current_user_id()));
+CREATE POLICY insert_admin ON app_public.topics FOR INSERT WITH CHECK ((author_id = app_public.current_user_id()));
 
 
 --
 -- Name: posts insert_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY insert_admin ON app_public.posts FOR INSERT WITH CHECK ((user_id = app_public.current_user_id()));
+CREATE POLICY insert_admin ON app_public.posts FOR INSERT WITH CHECK ((author_id = app_public.current_user_id()));
 
 
 --
@@ -1969,14 +1969,14 @@ CREATE POLICY update_admin ON app_public.forums FOR UPDATE USING (app_public.cur
 -- Name: topics update_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY update_admin ON app_public.topics FOR UPDATE USING (((user_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
+CREATE POLICY update_admin ON app_public.topics FOR UPDATE USING (((author_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
 
 
 --
 -- Name: posts update_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY update_admin ON app_public.posts FOR UPDATE USING (((user_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
+CREATE POLICY update_admin ON app_public.posts FOR UPDATE USING (((author_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
 
 
 --

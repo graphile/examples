@@ -1358,13 +1358,13 @@
               "deprecationReason": null
             },
             {
-              "name": "USER_ID_ASC",
+              "name": "AUTHOR_ID_ASC",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "USER_ID_DESC",
+              "name": "AUTHOR_ID_DESC",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -1459,8 +1459,8 @@
               "defaultValue": null
             },
             {
-              "name": "userId",
-              "description": "Checks for equality with the object’s `userId` field.",
+              "name": "authorId",
+              "description": "Checks for equality with the object’s `authorId` field.",
               "type": {
                 "kind": "SCALAR",
                 "name": "Int",
@@ -1650,7 +1650,7 @@
               "deprecationReason": null
             },
             {
-              "name": "userId",
+              "name": "authorId",
               "description": null,
               "args": [],
               "type": {
@@ -2852,13 +2852,13 @@
               "deprecationReason": null
             },
             {
-              "name": "USER_ID_ASC",
+              "name": "AUTHOR_ID_ASC",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "USER_ID_DESC",
+              "name": "AUTHOR_ID_DESC",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -2941,8 +2941,8 @@
               "defaultValue": null
             },
             {
-              "name": "userId",
-              "description": "Checks for equality with the object’s `userId` field.",
+              "name": "authorId",
+              "description": "Checks for equality with the object’s `authorId` field.",
               "type": {
                 "kind": "SCALAR",
                 "name": "Int",
@@ -3122,7 +3122,7 @@
               "deprecationReason": null
             },
             {
-              "name": "userId",
+              "name": "authorId",
               "description": "",
               "args": [],
               "type": {

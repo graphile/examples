@@ -37,7 +37,7 @@ grant delete on app_public.forums to graphiledemo_visitor;
 create table app_public.topics (
   id serial primary key,
   forum_id int not null references app_public.forums on delete cascade,
-  user_id int not null default app_public.current_user_id() references app_public.users on delete cascade,
+  author_id int not null default app_public.current_user_id() references app_public.users on delete cascade,
   title text not null check(length(title) > 0),
   body text not null default '',
   created_at timestamptz not null default now(),
@@ -57,9 +57,9 @@ comment on column app_public.topics.body is
   E'The body of the `Topic`, which Posts reply to.';
 
 create policy select_all on app_public.topics for select using (true);
-create policy insert_admin on app_public.topics for insert with check (user_id = app_public.current_user_id());
-create policy update_admin on app_public.topics for update using (user_id = app_public.current_user_id() or app_public.current_user_is_admin());
-create policy delete_admin on app_public.topics for delete using (user_id = app_public.current_user_id() or app_public.current_user_is_admin());
+create policy insert_admin on app_public.topics for insert with check (author_id = app_public.current_user_id());
+create policy update_admin on app_public.topics for update using (author_id = app_public.current_user_id() or app_public.current_user_is_admin());
+create policy delete_admin on app_public.topics for delete using (author_id = app_public.current_user_id() or app_public.current_user_is_admin());
 grant select on app_public.topics to graphiledemo_visitor;
 grant insert(forum_id, title, body) on app_public.topics to graphiledemo_visitor;
 grant update(title, body) on app_public.topics to graphiledemo_visitor;
@@ -86,7 +86,7 @@ $$;
 create table app_public.posts (
   id serial primary key,
   topic_id int not null references app_public.topics on delete cascade,
-  user_id int not null default app_public.current_user_id() references app_public.users on delete cascade,
+  author_id int not null default app_public.current_user_id() references app_public.users on delete cascade,
   body text not null default '',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -103,7 +103,7 @@ comment on column app_public.posts.id is
   E'@omit create,update';
 comment on column app_public.posts.topic_id is
   E'@omit update';
-comment on column app_public.posts.user_id is
+comment on column app_public.posts.author_id is
   E'@omit create,update';
 comment on column app_public.posts.body is
   E'The body of the `Topic`, which Posts reply to.';
@@ -113,9 +113,9 @@ comment on column app_public.posts.updated_at is
   E'@omit create,update';
 
 create policy select_all on app_public.posts for select using (true);
-create policy insert_admin on app_public.posts for insert with check (user_id = app_public.current_user_id());
-create policy update_admin on app_public.posts for update using (user_id = app_public.current_user_id() or app_public.current_user_is_admin());
-create policy delete_admin on app_public.posts for delete using (user_id = app_public.current_user_id() or app_public.current_user_is_admin());
+create policy insert_admin on app_public.posts for insert with check (author_id = app_public.current_user_id());
+create policy update_admin on app_public.posts for update using (author_id = app_public.current_user_id() or app_public.current_user_is_admin());
+create policy delete_admin on app_public.posts for delete using (author_id = app_public.current_user_id() or app_public.current_user_is_admin());
 grant select on app_public.posts to graphiledemo_visitor;
 grant insert(topic_id, body) on app_public.posts to graphiledemo_visitor;
 grant update(body) on app_public.posts to graphiledemo_visitor;
