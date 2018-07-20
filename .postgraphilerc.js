@@ -40,7 +40,7 @@ module.exports = {
     options: {
       dynamicJson,
       graphiql,
-      watch,
+      watchPg: watch,
       appendPlugins,
     },
   },
@@ -50,7 +50,7 @@ module.exports = {
     schema,
     dynamicJson,
     disableGraphiql: !graphiql,
-    watchPg: watch,
+    watch,
     appendPlugins,
   },
 };
