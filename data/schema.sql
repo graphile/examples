@@ -904,6 +904,61 @@ If you''ve forgotten your password, give us one of your email addresses and we''
 
 
 --
+-- Name: forums; Type: TABLE; Schema: app_public; Owner: -
+--
+
+CREATE TABLE app_public.forums (
+    id integer NOT NULL,
+    slug text NOT NULL,
+    name text NOT NULL,
+    description text DEFAULT ''::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT forums_name_check CHECK ((length(name) > 0)),
+    CONSTRAINT forums_slug_check CHECK (((length(slug) < 30) AND (slug ~ '^([a-z0-9]-?)+$'::text)))
+);
+
+
+--
+-- Name: TABLE forums; Type: COMMENT; Schema: app_public; Owner: -
+--
+
+COMMENT ON TABLE app_public.forums IS 'A subject-based grouping of topics and posts.';
+
+
+--
+-- Name: COLUMN forums.slug; Type: COMMENT; Schema: app_public; Owner: -
+--
+
+COMMENT ON COLUMN app_public.forums.slug IS 'An URL-safe alias for the `Forum`.';
+
+
+--
+-- Name: COLUMN forums.name; Type: COMMENT; Schema: app_public; Owner: -
+--
+
+COMMENT ON COLUMN app_public.forums.name IS 'The name of the `Forum` (indicates its subject matter).';
+
+
+--
+-- Name: COLUMN forums.description; Type: COMMENT; Schema: app_public; Owner: -
+--
+
+COMMENT ON COLUMN app_public.forums.description IS 'A brief description of the `Forum` including it''s purpose.';
+
+
+--
+-- Name: forums_about_cats(); Type: FUNCTION; Schema: app_public; Owner: -
+--
+
+CREATE FUNCTION app_public.forums_about_cats() RETURNS SETOF app_public.forums
+    LANGUAGE sql STABLE
+    AS $$
+  select * from app_public.forums where slug like 'cat-%';
+$$;
+
+
+--
 -- Name: random_number(); Type: FUNCTION; Schema: app_public; Owner: -
 --
 
@@ -1134,50 +1189,6 @@ CREATE TABLE app_private.user_secrets (
 --
 
 COMMENT ON TABLE app_private.user_secrets IS 'The contents of this table should never be visible to the user. Contains data mostly related to authentication.';
-
-
---
--- Name: forums; Type: TABLE; Schema: app_public; Owner: -
---
-
-CREATE TABLE app_public.forums (
-    id integer NOT NULL,
-    slug text NOT NULL,
-    name text NOT NULL,
-    description text DEFAULT ''::text NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT forums_name_check CHECK ((length(name) > 0)),
-    CONSTRAINT forums_slug_check CHECK (((length(slug) < 30) AND (slug ~ '^([a-z0-9]-?)+$'::text)))
-);
-
-
---
--- Name: TABLE forums; Type: COMMENT; Schema: app_public; Owner: -
---
-
-COMMENT ON TABLE app_public.forums IS 'A subject-based grouping of topics and posts.';
-
-
---
--- Name: COLUMN forums.slug; Type: COMMENT; Schema: app_public; Owner: -
---
-
-COMMENT ON COLUMN app_public.forums.slug IS 'An URL-safe alias for the `Forum`.';
-
-
---
--- Name: COLUMN forums.name; Type: COMMENT; Schema: app_public; Owner: -
---
-
-COMMENT ON COLUMN app_public.forums.name IS 'The name of the `Forum` (indicates its subject matter).';
-
-
---
--- Name: COLUMN forums.description; Type: COMMENT; Schema: app_public; Owner: -
---
-
-COMMENT ON COLUMN app_public.forums.description IS 'A brief description of the `Forum` including it''s purpose.';
 
 
 --
@@ -2022,34 +2033,6 @@ GRANT UPDATE(avatar_url) ON TABLE app_public.users TO graphiledemo_visitor;
 
 
 --
--- Name: TABLE topics; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT SELECT,DELETE ON TABLE app_public.topics TO graphiledemo_visitor;
-
-
---
--- Name: COLUMN topics.forum_id; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT INSERT(forum_id) ON TABLE app_public.topics TO graphiledemo_visitor;
-
-
---
--- Name: COLUMN topics.title; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT INSERT(title),UPDATE(title) ON TABLE app_public.topics TO graphiledemo_visitor;
-
-
---
--- Name: COLUMN topics.body; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT INSERT(body),UPDATE(body) ON TABLE app_public.topics TO graphiledemo_visitor;
-
-
---
 -- Name: TABLE forums; Type: ACL; Schema: app_public; Owner: -
 --
 
@@ -2075,6 +2058,34 @@ GRANT INSERT(name),UPDATE(name) ON TABLE app_public.forums TO graphiledemo_visit
 --
 
 GRANT INSERT(description),UPDATE(description) ON TABLE app_public.forums TO graphiledemo_visitor;
+
+
+--
+-- Name: TABLE topics; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT SELECT,DELETE ON TABLE app_public.topics TO graphiledemo_visitor;
+
+
+--
+-- Name: COLUMN topics.forum_id; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT INSERT(forum_id) ON TABLE app_public.topics TO graphiledemo_visitor;
+
+
+--
+-- Name: COLUMN topics.title; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT INSERT(title),UPDATE(title) ON TABLE app_public.topics TO graphiledemo_visitor;
+
+
+--
+-- Name: COLUMN topics.body; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT INSERT(body),UPDATE(body) ON TABLE app_public.topics TO graphiledemo_visitor;
 
 
 --

@@ -130,3 +130,9 @@ $$;
 
 comment on function app_public.random_number()
   is 'Chosen by fair dice roll. Guaranteed to be random. XKCD#221';
+
+create function app_public.forums_about_cats() returns setof app_public.forums
+language sql stable
+as $$
+  select * from app_public.forums where slug like 'cat-%';
+$$;
