@@ -5,6 +5,10 @@ select app_private.link_or_register_user(
   '{}'::json,
   '{}'::json
 );
+
+insert into app_public.user_emails(user_id, email, is_verified) values
+  (1, 'user@example.com', true);
+
 insert into app_public.forums(slug, name, description) values
   ('cat-life', 'Cat Life', 'A forum all about cats and how fluffy they are and how they completely ignore their owners unless there is food. Or yarn.'),
   ('dog-life', 'Dog Life', ''),
