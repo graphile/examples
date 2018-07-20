@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 import { propType } from "graphql-anywhere";
 import { Link } from "react-router-dom";
 import moment from "moment";
+import ForumItem from "./ForumItem";
 
 export default class TopicItem extends React.Component {
   static TopicFragment = gql`
@@ -25,6 +26,7 @@ export default class TopicItem extends React.Component {
 
   static propTypes = {
     topic: propType(TopicItem.TopicFragment),
+    forum: propType(ForumItem.TopicFragment),
   };
 
   render() {

@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 import { Query } from "react-apollo";
 import StandardLayout from "../layouts/StandardLayout";
 import ForumPage from "../components/ForumPage";
+import PropTypes from "prop-types";
 
 const ForumQuery = gql`
   query ForumQuery($slug: String!) {
@@ -14,6 +15,13 @@ const ForumQuery = gql`
 `;
 
 export default class ForumRoute extends React.Component {
+  static propTypes = {
+    match: PropTypes.shape({
+      params: PropTypes.shape({
+        id: PropTypes.node,
+      }).isRequired,
+    }).isRequired,
+  };
   render() {
     const {
       params: { slug },

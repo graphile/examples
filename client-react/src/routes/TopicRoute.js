@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 import { Query } from "react-apollo";
 import StandardLayout from "../layouts/StandardLayout";
 import TopicPage from "../components/TopicPage";
+import PropTypes from "prop-types";
 
 const TopicQuery = gql`
   query TopicQuery($topic: Int!) {
@@ -14,6 +15,14 @@ const TopicQuery = gql`
 `;
 
 export default class TopicRoute extends React.Component {
+  static propTypes = {
+    match: PropTypes.shape({
+      params: PropTypes.shape({
+        id: PropTypes.node,
+      }).isRequired,
+    }).isRequired,
+  };
+
   render() {
     console.log(this.props);
     const {

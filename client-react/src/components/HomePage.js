@@ -86,7 +86,7 @@ export default class HomePage extends React.Component {
             <p>Hello administrator! Would you like to create a new forum?</p>
             <CreateNewForumForm
               data={data}
-              onCreateForum={forum => {
+              onCreateForum={_ => {
                 // TODO: alter the cache
                 data.refetch();
               }}

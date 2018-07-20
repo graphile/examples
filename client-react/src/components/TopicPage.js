@@ -110,7 +110,7 @@ export default class TopicPage extends React.Component {
             <h2>Reply to this topic</h2>
             <CreateNewReplyForm
               data={data}
-              onCreatePost={post => {
+              onCreatePost={_ => {
                 // TODO: alter the cache
                 data.refetch();
               }}

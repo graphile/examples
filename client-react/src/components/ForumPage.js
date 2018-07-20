@@ -101,7 +101,7 @@ export default class ForumPage extends React.Component {
             <h2>Create new topic</h2>
             <CreateNewTopicForm
               data={data}
-              onCreateTopic={forum => {
+              onCreateTopic={_ => {
                 // TODO: alter the cache
                 data.refetch();
               }}
