@@ -11,7 +11,7 @@ export default class TopicItem extends React.Component {
       id
       title
       body
-      user {
+      user: author {
         nodeId
         avatarUrl
         name

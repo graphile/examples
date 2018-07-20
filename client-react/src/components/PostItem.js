@@ -10,7 +10,7 @@ export default class PostItem extends React.Component {
       id
       body
       createdAt
-      user {
+      user: author {
         id
         avatarUrl
         name
