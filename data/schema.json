@@ -1742,7 +1742,7 @@
               "deprecationReason": null
             },
             {
-              "name": "user",
+              "name": "author",
               "description": "Reads a single `User` that is related to this `Topic`.",
               "args": [],
               "type": {
@@ -3198,7 +3198,7 @@
               "deprecationReason": null
             },
             {
-              "name": "user",
+              "name": "author",
               "description": "Reads a single `User` that is related to this `Post`.",
               "args": [],
               "type": {
@@ -4600,7 +4600,7 @@
               "deprecationReason": null
             },
             {
-              "name": "user",
+              "name": "author",
               "description": "Reads a single `User` that is related to this `Post`.",
               "args": [],
               "type": {
@@ -4786,7 +4786,7 @@
               "deprecationReason": null
             },
             {
-              "name": "user",
+              "name": "author",
               "description": "Reads a single `User` that is related to this `Topic`.",
               "args": [],
               "type": {
@@ -5374,7 +5374,7 @@
               "deprecationReason": null
             },
             {
-              "name": "user",
+              "name": "author",
               "description": "Reads a single `User` that is related to this `Post`.",
               "args": [],
               "type": {
@@ -5605,7 +5605,7 @@
               "deprecationReason": null
             },
             {
-              "name": "user",
+              "name": "author",
               "description": "Reads a single `User` that is related to this `Topic`.",
               "args": [],
               "type": {
@@ -6402,7 +6402,7 @@
               "deprecationReason": null
             },
             {
-              "name": "user",
+              "name": "author",
               "description": "Reads a single `User` that is related to this `Post`.",
               "args": [],
               "type": {
@@ -6586,7 +6586,7 @@
               "deprecationReason": null
             },
             {
-              "name": "user",
+              "name": "author",
               "description": "Reads a single `User` that is related to this `Topic`.",
               "args": [],
               "type": {

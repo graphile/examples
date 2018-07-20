@@ -65,7 +65,7 @@ type CreatePostPayload {
   topic: Topic
 
   """Reads a single `User` that is related to this `Post`."""
-  user: User
+  author: User
 
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
@@ -106,7 +106,7 @@ type CreateTopicPayload {
   forum: Forum
 
   """Reads a single `User` that is related to this `Topic`."""
-  user: User
+  author: User
 
   """An edge for our `Topic`. May be used by Relay 1."""
   topicEdge(
@@ -267,7 +267,7 @@ type DeletePostPayload {
   topic: Topic
 
   """Reads a single `User` that is related to this `Post`."""
-  user: User
+  author: User
 
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
@@ -321,7 +321,7 @@ type DeleteTopicPayload {
   forum: Forum
 
   """Reads a single `User` that is related to this `Topic`."""
-  user: User
+  author: User
 
   """An edge for our `Topic`. May be used by Relay 1."""
   topicEdge(
@@ -998,7 +998,7 @@ type Post implements Node {
   topic: Topic
 
   """Reads a single `User` that is related to this `Post`."""
-  user: User
+  author: User
 }
 
 """
@@ -1264,7 +1264,7 @@ type Topic implements Node {
   forum: Forum
 
   """Reads a single `User` that is related to this `Topic`."""
-  user: User
+  author: User
 
   """Reads and enables pagination through a set of `Post`."""
   posts(
@@ -1520,7 +1520,7 @@ type UpdatePostPayload {
   topic: Topic
 
   """Reads a single `User` that is related to this `Post`."""
-  user: User
+  author: User
 
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
@@ -1583,7 +1583,7 @@ type UpdateTopicPayload {
   forum: Forum
 
   """Reads a single `User` that is related to this `Topic`."""
-  user: User
+  author: User
 
   """An edge for our `Topic`. May be used by Relay 1."""
   topicEdge(
