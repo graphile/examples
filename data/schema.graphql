@@ -538,7 +538,7 @@ type ForgotPasswordPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  boolean: Boolean
+  success: Boolean
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

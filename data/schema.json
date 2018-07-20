@@ -7369,7 +7369,7 @@
               "deprecationReason": null
             },
             {
-              "name": "boolean",
+              "name": "success",
               "description": null,
               "args": [],
               "type": {

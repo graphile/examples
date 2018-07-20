@@ -84,6 +84,7 @@ psql -X -v ON_ERROR_STOP=1 template1 <<SQL
 -- RESET database
 DROP DATABASE IF EXISTS graphiledemo;
 DROP DATABASE IF EXISTS graphiledemo_test;
+DROP DATABASE IF EXISTS graphile_org_demo;
 DROP ROLE IF EXISTS graphiledemo_visitor;
 DROP ROLE IF EXISTS graphiledemo_admin;
 DROP ROLE IF EXISTS graphiledemo_authenticator;

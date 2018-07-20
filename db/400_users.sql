@@ -286,7 +286,7 @@ end;
 $$ language plpgsql strict security definer volatile set search_path from current;
 
 comment on function app_public.forgot_password(email text) is
-  E'If you''ve forgotten your password, give us one of your email addresses and we'' send you a reset token. Note this only works if you have added an email address!';
+  E'@resultFieldName success\nIf you''ve forgotten your password, give us one of your email addresses and we'' send you a reset token. Note this only works if you have added an email address!';
 
 --------------------------------------------------------------------------------
 

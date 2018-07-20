@@ -899,7 +899,8 @@ $$;
 -- Name: FUNCTION forgot_password(email text); Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON FUNCTION app_public.forgot_password(email text) IS 'If you''ve forgotten your password, give us one of your email addresses and we'' send you a reset token. Note this only works if you have added an email address!';
+COMMENT ON FUNCTION app_public.forgot_password(email text) IS '@resultFieldName success
+If you''ve forgotten your password, give us one of your email addresses and we'' send you a reset token. Note this only works if you have added an email address!';
 
 
 --
