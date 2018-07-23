@@ -19,7 +19,7 @@
     "slug": "0.9.1"
   },
   "scripts": {
-    "start": "if [ -x ../.env ]; then source ../.env; fi; BROWSER=none PORT=$CLIENT_PORT react-scripts start",
+    "start": "if [ -x ../.env ]; then . ../.env; fi; BROWSER=none PORT=$CLIENT_PORT react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
