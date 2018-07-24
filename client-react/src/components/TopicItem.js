@@ -18,7 +18,7 @@ export default class TopicItem extends React.Component {
         avatarUrl
         name
       }
-      posts {
+      posts(last: 4) {
           totalCount
           nodes {
               author {
@@ -37,7 +37,6 @@ export default class TopicItem extends React.Component {
 
   render() {
       const { topic, forum } = this.props;
-      const avatarList = topic.posts.nodes.slice(-4);
 
 
       return (
@@ -46,7 +45,7 @@ export default class TopicItem extends React.Component {
                   <Link className="topic-item__link" to={`/forums/${forum.slug}/${topic.id}`}>{topic.title}</Link>
               </td>
               <td className="topic-item__profiles">
-                  {avatarList.map(({author}, index) => (
+                  {topic.posts.nodes.map(({author}, index) => (
                       <div className="topic-item__profile-container">
                           <img
                               className="topic-item__profile"
