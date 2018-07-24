@@ -4,6 +4,7 @@ import { propType } from "graphql-anywhere";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import ForumItem from "./ForumItem";
+import logo from "../logo.svg";
 
 export default class TopicItem extends React.Component {
   static TopicFragment = gql`
@@ -18,7 +19,12 @@ export default class TopicItem extends React.Component {
         name
       }
       posts {
-        totalCount
+          totalCount
+          nodes {
+              author {
+                  avatarUrl
+              }
+          }
       }
       updatedAt
     }
@@ -30,17 +36,30 @@ export default class TopicItem extends React.Component {
   };
 
   render() {
-    const { topic, forum } = this.props;
+      const { topic, forum } = this.props;
+      const avatarList = topic.posts.nodes.slice(-4);
 
-    return (
-      <tr className="TopicItem">
-        <td className="TopicItem-title">
-          <Link to={`/forums/${forum.slug}/${topic.id}`}>{topic.title}</Link>
-        </td>
-        <td className="TopicItem-user">{topic.user.name || "anonymous"}</td>
-        <td className="TopicItem-replies">{topic.posts.totalCount}</td>
-        <td className="TopicItem-date">{moment(topic.updatedAt).calendar()}</td>
-      </tr>
-    );
+
+      return (
+          <tr className="topic-item">
+              <td className="topic-item__title">
+                  <Link className="topic-item__link" to={`/forums/${forum.slug}/${topic.id}`}>{topic.title}</Link>
+              </td>
+              <td className="topic-item__profiles">
+                  {avatarList.map(({author}, index) => (
+                      <div className="topic-item__profile-container">
+                          <img
+                              className="topic-item__profile"
+                              key={index}
+                              src={author.avatarUrl || logo}
+                              alt=""
+                          />
+                      </div>
+                  ))}
+              </td>
+              <td className="topic-item__replies">{topic.posts.totalCount}</td>
+              <td className="topic-item__date">{moment(topic.updatedAt).fromNow(true)}</td>
+          </tr>
+      );
   }
 }

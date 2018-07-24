@@ -92,19 +92,60 @@ a {
   color: #919191;
 }
 
-.Topics-container, .Posts-container {
+.Topics-container,
+.Posts-container,
+.slim-wrapper {
   border-collapse: collapse;
-  max-width: 1110px;
   margin-left: auto;
   margin-right: auto;
+  width: 100%;
+  max-width: 1110px;
 }
 
-.TopicItem {
-  border-bottom: 1px solid #e9e9e9;
-  display: table-row;
+.topic-item {
+    display: table-row;
+    font-size: 14px;
+    color: #999;
+    border-bottom: 1px solid #eee;
+    text-align: center;
 }
 
-.TopicItem a, .WelcomeMessage a {
+.topic-item td {
+    padding: 20px 16px;
+    min-width: 90px;
+}
+
+.topic-item__title {
+    width: 100%;
+    text-align: left;
+}
+
+.topic-item__link {
+    font-size: 18px;
+    color: #333;
+}
+
+.topic-item__profiles {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: center;
+}
+
+.topic-item__profile-container {
+    width: 20px;
+    height: 20px;
+    transform: translateX(-25%) translateY(-6px);;
+}
+
+.topic-item__profile {
+    max-width: 32px;
+    border-radius: 50%;
+    border: 1px solid white;
+    vertical-align: middle;
+}
+
+.WelcomeMessage a {
   color: #0074ca;
 }
 
@@ -115,17 +156,19 @@ a {
   width: 500px;
 }
 
-.Topics-TopicItemHeader th {
-  color: #919191;
+.topic-items__header th {
+  color: #999;
   font-weight: normal;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  padding-left: none;
-  text-align: left;
+  text-align: center;
+  padding: 16px 16px 8px;
 }
 
-.Topics-container tbody {
-  border-top: 3px solid #e9e9e9;
+.topic-items__header th:first-child {
+    text-align: left;
+}
+
+.topic-items__body {
+  border-top: 1px solid #eee;
 }
 
 .TopicItem-user, .TopicItem-replies, TopicItem-date {

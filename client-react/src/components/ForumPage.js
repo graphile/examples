@@ -57,16 +57,16 @@ export default class ForumPage extends React.Component {
         <div className="Forum-description">
           Welcome to {forum.name}! {forum.description}
         </div>
-        <table className="Topics-container">
+        <table className="slim-wrapper topic-items">
           <thead>
-            <tr className="Topics-TopicItemHeader">
-              <th>Topic</th>
-              <th>Author</th>
+            <tr className="topic-items__header">
+              <th>Title</th>
+              <th>Latest</th>
               <th>Replies</th>
-              <th>Last post</th>
+              <th>Last Update</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="topic-items__body">
             {forum.topics.nodes.length ? (
               forum.topics.nodes.map(node => (
                 <TopicItem
