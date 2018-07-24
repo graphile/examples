@@ -13,6 +13,7 @@ export default class TopicItem extends React.Component {
       id
       title
       body
+      updatedAt
       user: author {
         nodeId
         avatarUrl
@@ -26,7 +27,6 @@ export default class TopicItem extends React.Component {
               }
           }
       }
-      updatedAt
     }
   `;
 
