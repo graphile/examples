@@ -2,14 +2,15 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.0
--- Dumped by pg_dump version 10.0
+-- Dumped from database version 10.3
+-- Dumped by pg_dump version 10.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
@@ -91,8 +92,6 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
-SET search_path = app_jobs, pg_catalog;
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -101,7 +100,7 @@ SET default_with_oids = false;
 -- Name: jobs; Type: TABLE; Schema: app_jobs; Owner: -
 --
 
-CREATE TABLE jobs (
+CREATE TABLE app_jobs.jobs (
     id integer NOT NULL,
     queue_name character varying DEFAULT (public.gen_random_uuid())::character varying NOT NULL,
     task_identifier character varying NOT NULL,
@@ -119,7 +118,7 @@ CREATE TABLE jobs (
 -- Name: add_job(character varying, json); Type: FUNCTION; Schema: app_jobs; Owner: -
 --
 
-CREATE FUNCTION add_job(identifier character varying, payload json) RETURNS jobs
+CREATE FUNCTION app_jobs.add_job(identifier character varying, payload json) RETURNS app_jobs.jobs
     LANGUAGE sql
     AS $$
   INSERT INTO app_jobs.jobs(task_identifier, payload) VALUES(identifier, payload) RETURNING *;
@@ -130,7 +129,7 @@ $$;
 -- Name: add_job(character varying, character varying, json); Type: FUNCTION; Schema: app_jobs; Owner: -
 --
 
-CREATE FUNCTION add_job(identifier character varying, queue_name character varying, payload json) RETURNS jobs
+CREATE FUNCTION app_jobs.add_job(identifier character varying, queue_name character varying, payload json) RETURNS app_jobs.jobs
     LANGUAGE sql
     AS $$
   INSERT INTO app_jobs.jobs(task_identifier, queue_name, payload) VALUES(identifier, queue_name, payload) RETURNING *;
@@ -141,7 +140,7 @@ $$;
 -- Name: complete_job(character varying, integer); Type: FUNCTION; Schema: app_jobs; Owner: -
 --
 
-CREATE FUNCTION complete_job(worker_id character varying, job_id integer) RETURNS jobs
+CREATE FUNCTION app_jobs.complete_job(worker_id character varying, job_id integer) RETURNS app_jobs.jobs
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -164,7 +163,7 @@ $$;
 -- Name: do_notify(); Type: FUNCTION; Schema: app_jobs; Owner: -
 --
 
-CREATE FUNCTION do_notify() RETURNS trigger
+CREATE FUNCTION app_jobs.do_notify() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -178,7 +177,7 @@ $$;
 -- Name: fail_job(character varying, integer, character varying); Type: FUNCTION; Schema: app_jobs; Owner: -
 --
 
-CREATE FUNCTION fail_job(worker_id character varying, job_id integer, error_message character varying) RETURNS jobs
+CREATE FUNCTION app_jobs.fail_job(worker_id character varying, job_id integer, error_message character varying) RETURNS app_jobs.jobs
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -204,7 +203,7 @@ $$;
 -- Name: get_job(character varying, character varying[]); Type: FUNCTION; Schema: app_jobs; Owner: -
 --
 
-CREATE FUNCTION get_job(worker_id character varying, identifiers character varying[]) RETURNS jobs
+CREATE FUNCTION app_jobs.get_job(worker_id character varying, identifiers character varying[]) RETURNS app_jobs.jobs
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -253,7 +252,7 @@ $$;
 -- Name: jobs__decrease_job_queue_count(); Type: FUNCTION; Schema: app_jobs; Owner: -
 --
 
-CREATE FUNCTION jobs__decrease_job_queue_count() RETURNS trigger
+CREATE FUNCTION app_jobs.jobs__decrease_job_queue_count() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -275,7 +274,7 @@ $$;
 -- Name: jobs__increase_job_queue_count(); Type: FUNCTION; Schema: app_jobs; Owner: -
 --
 
-CREATE FUNCTION jobs__increase_job_queue_count() RETURNS trigger
+CREATE FUNCTION app_jobs.jobs__increase_job_queue_count() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -292,7 +291,7 @@ $$;
 -- Name: schedule_job(character varying, character varying, json, timestamp with time zone); Type: FUNCTION; Schema: app_jobs; Owner: -
 --
 
-CREATE FUNCTION schedule_job(identifier character varying, queue_name character varying, payload json, run_at timestamp with time zone) RETURNS jobs
+CREATE FUNCTION app_jobs.schedule_job(identifier character varying, queue_name character varying, payload json, run_at timestamp with time zone) RETURNS app_jobs.jobs
     LANGUAGE sql
     AS $$
   INSERT INTO app_jobs.jobs(task_identifier, queue_name, payload, run_at) VALUES(identifier, queue_name, payload, run_at) RETURNING *;
@@ -303,7 +302,7 @@ $$;
 -- Name: update_timestamps(); Type: FUNCTION; Schema: app_jobs; Owner: -
 --
 
-CREATE FUNCTION update_timestamps() RETURNS trigger
+CREATE FUNCTION app_jobs.update_timestamps() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -319,13 +318,11 @@ END;
 $$;
 
 
-SET search_path = app_public, pg_catalog;
-
 --
 -- Name: users; Type: TABLE; Schema: app_public; Owner: -
 --
 
-CREATE TABLE users (
+CREATE TABLE app_public.users (
     id integer NOT NULL,
     username public.citext NOT NULL,
     name text,
@@ -342,7 +339,7 @@ CREATE TABLE users (
 -- Name: TABLE users; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON TABLE users IS '@omit all
+COMMENT ON TABLE app_public.users IS '@omit all
 A user who can log in to the application.';
 
 
@@ -350,44 +347,42 @@ A user who can log in to the application.';
 -- Name: COLUMN users.id; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN users.id IS 'Unique identifier for the user.';
+COMMENT ON COLUMN app_public.users.id IS 'Unique identifier for the user.';
 
 
 --
 -- Name: COLUMN users.username; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN users.username IS 'Public-facing username (or ''handle'') of the user.';
+COMMENT ON COLUMN app_public.users.username IS 'Public-facing username (or ''handle'') of the user.';
 
 
 --
 -- Name: COLUMN users.name; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN users.name IS 'Public-facing name (or pseudonym) of the user.';
+COMMENT ON COLUMN app_public.users.name IS 'Public-facing name (or pseudonym) of the user.';
 
 
 --
 -- Name: COLUMN users.avatar_url; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN users.avatar_url IS 'Optional avatar URL.';
+COMMENT ON COLUMN app_public.users.avatar_url IS 'Optional avatar URL.';
 
 
 --
 -- Name: COLUMN users.is_admin; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN users.is_admin IS 'If true, the user has elevated privileges.';
+COMMENT ON COLUMN app_public.users.is_admin IS 'If true, the user has elevated privileges.';
 
-
-SET search_path = app_private, pg_catalog;
 
 --
 -- Name: link_or_register_user(integer, character varying, character varying, json, json); Type: FUNCTION; Schema: app_private; Owner: -
 --
 
-CREATE FUNCTION link_or_register_user(f_user_id integer, f_service character varying, f_identifier character varying, f_profile json, f_auth_details json) RETURNS app_public.users
+CREATE FUNCTION app_private.link_or_register_user(f_user_id integer, f_service character varying, f_identifier character varying, f_profile json, f_auth_details json) RETURNS app_public.users
     LANGUAGE plpgsql SECURITY DEFINER
     SET search_path TO "$user", public
     AS $$
@@ -470,14 +465,14 @@ $$;
 -- Name: FUNCTION link_or_register_user(f_user_id integer, f_service character varying, f_identifier character varying, f_profile json, f_auth_details json); Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON FUNCTION link_or_register_user(f_user_id integer, f_service character varying, f_identifier character varying, f_profile json, f_auth_details json) IS 'If you''re logged in, this will link an additional OAuth login to your account if necessary. If you''re logged out it may find if an account already exists (based on OAuth details or email address) and return that, or create a new user account if necessary.';
+COMMENT ON FUNCTION app_private.link_or_register_user(f_user_id integer, f_service character varying, f_identifier character varying, f_profile json, f_auth_details json) IS 'If you''re logged in, this will link an additional OAuth login to your account if necessary. If you''re logged out it may find if an account already exists (based on OAuth details or email address) and return that, or create a new user account if necessary.';
 
 
 --
 -- Name: login(text, text); Type: FUNCTION; Schema: app_private; Owner: -
 --
 
-CREATE FUNCTION login(username text, password text) RETURNS app_public.users
+CREATE FUNCTION app_private.login(username text, password text) RETURNS app_public.users
     LANGUAGE plpgsql STRICT SECURITY DEFINER
     SET search_path TO "$user", public
     AS $$
@@ -546,14 +541,14 @@ $$;
 -- Name: FUNCTION login(username text, password text); Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON FUNCTION login(username text, password text) IS 'Returns a user that matches the username/password combo, or null on failure.';
+COMMENT ON FUNCTION app_private.login(username text, password text) IS 'Returns a user that matches the username/password combo, or null on failure.';
 
 
 --
 -- Name: really_create_user(text, text, boolean, text, text, text); Type: FUNCTION; Schema: app_private; Owner: -
 --
 
-CREATE FUNCTION really_create_user(username text, email text, email_is_verified boolean, name text, avatar_url text, password text DEFAULT NULL::text) RETURNS app_public.users
+CREATE FUNCTION app_private.really_create_user(username text, email text, email_is_verified boolean, name text, avatar_url text, password text DEFAULT NULL::text) RETURNS app_public.users
     LANGUAGE plpgsql
     SET search_path TO "$user", public
     AS $$
@@ -615,14 +610,14 @@ $$;
 -- Name: FUNCTION really_create_user(username text, email text, email_is_verified boolean, name text, avatar_url text, password text); Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON FUNCTION really_create_user(username text, email text, email_is_verified boolean, name text, avatar_url text, password text) IS 'Creates a user account. All arguments are optional, it trusts the calling method to perform sanitisation.';
+COMMENT ON FUNCTION app_private.really_create_user(username text, email text, email_is_verified boolean, name text, avatar_url text, password text) IS 'Creates a user account. All arguments are optional, it trusts the calling method to perform sanitisation.';
 
 
 --
 -- Name: register_user(character varying, character varying, json, json, boolean); Type: FUNCTION; Schema: app_private; Owner: -
 --
 
-CREATE FUNCTION register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean DEFAULT false) RETURNS app_public.users
+CREATE FUNCTION app_private.register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean DEFAULT false) RETURNS app_public.users
     LANGUAGE plpgsql SECURITY DEFINER
     SET search_path TO "$user", public
     AS $$
@@ -664,14 +659,14 @@ $$;
 -- Name: FUNCTION register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean); Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON FUNCTION register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean) IS 'Used to register a user from information gleaned from OAuth. Primarily used by link_or_register_user';
+COMMENT ON FUNCTION app_private.register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean) IS 'Used to register a user from information gleaned from OAuth. Primarily used by link_or_register_user';
 
 
 --
 -- Name: tg__add_job_for_row(); Type: FUNCTION; Schema: app_private; Owner: -
 --
 
-CREATE FUNCTION tg__add_job_for_row() RETURNS trigger
+CREATE FUNCTION app_private.tg__add_job_for_row() RETURNS trigger
     LANGUAGE plpgsql
     SET search_path TO "$user", public
     AS $$
@@ -686,14 +681,14 @@ $$;
 -- Name: FUNCTION tg__add_job_for_row(); Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON FUNCTION tg__add_job_for_row() IS 'Useful shortcut to create a job on insert or update. Pass the task name as the trigger argument, and the record id will automatically be available on the JSON payload.';
+COMMENT ON FUNCTION app_private.tg__add_job_for_row() IS 'Useful shortcut to create a job on insert or update. Pass the task name as the trigger argument, and the record id will automatically be available on the JSON payload.';
 
 
 --
 -- Name: tg__update_timestamps(); Type: FUNCTION; Schema: app_private; Owner: -
 --
 
-CREATE FUNCTION tg__update_timestamps() RETURNS trigger
+CREATE FUNCTION app_private.tg__update_timestamps() RETURNS trigger
     LANGUAGE plpgsql
     SET search_path TO "$user", public
     AS $$
@@ -709,14 +704,14 @@ $$;
 -- Name: FUNCTION tg__update_timestamps(); Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON FUNCTION tg__update_timestamps() IS 'This trigger should be called on all tables with created_at, updated_at - it ensures that they cannot be manipulated and that updated_at will always be larger than the previous updated_at.';
+COMMENT ON FUNCTION app_private.tg__update_timestamps() IS 'This trigger should be called on all tables with created_at, updated_at - it ensures that they cannot be manipulated and that updated_at will always be larger than the previous updated_at.';
 
 
 --
 -- Name: tg_user_email_secrets__insert_with_user_email(); Type: FUNCTION; Schema: app_private; Owner: -
 --
 
-CREATE FUNCTION tg_user_email_secrets__insert_with_user_email() RETURNS trigger
+CREATE FUNCTION app_private.tg_user_email_secrets__insert_with_user_email() RETURNS trigger
     LANGUAGE plpgsql
     SET search_path TO "$user", public
     AS $$
@@ -736,14 +731,14 @@ $$;
 -- Name: FUNCTION tg_user_email_secrets__insert_with_user_email(); Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON FUNCTION tg_user_email_secrets__insert_with_user_email() IS 'Ensures that every user_email record has an associated user_email_secret record.';
+COMMENT ON FUNCTION app_private.tg_user_email_secrets__insert_with_user_email() IS 'Ensures that every user_email record has an associated user_email_secret record.';
 
 
 --
 -- Name: tg_user_secrets__insert_with_user(); Type: FUNCTION; Schema: app_private; Owner: -
 --
 
-CREATE FUNCTION tg_user_secrets__insert_with_user() RETURNS trigger
+CREATE FUNCTION app_private.tg_user_secrets__insert_with_user() RETURNS trigger
     LANGUAGE plpgsql
     SET search_path TO "$user", public
     AS $$
@@ -758,14 +753,14 @@ $$;
 -- Name: FUNCTION tg_user_secrets__insert_with_user(); Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON FUNCTION tg_user_secrets__insert_with_user() IS 'Ensures that every user record has an associated user_secret record.';
+COMMENT ON FUNCTION app_private.tg_user_secrets__insert_with_user() IS 'Ensures that every user record has an associated user_secret record.';
 
 
 --
 -- Name: tg_users__make_first_user_admin(); Type: FUNCTION; Schema: app_private; Owner: -
 --
 
-CREATE FUNCTION tg_users__make_first_user_admin() RETURNS trigger
+CREATE FUNCTION app_private.tg_users__make_first_user_admin() RETURNS trigger
     LANGUAGE plpgsql
     SET search_path TO "$user", public
     AS $$
@@ -778,13 +773,11 @@ end;
 $$;
 
 
-SET search_path = app_public, pg_catalog;
-
 --
 -- Name: current_user(); Type: FUNCTION; Schema: app_public; Owner: -
 --
 
-CREATE FUNCTION "current_user"() RETURNS users
+CREATE FUNCTION app_public."current_user"() RETURNS app_public.users
     LANGUAGE sql STABLE
     SET search_path TO "$user", public
     AS $$
@@ -796,7 +789,7 @@ $$;
 -- Name: current_user_id(); Type: FUNCTION; Schema: app_public; Owner: -
 --
 
-CREATE FUNCTION current_user_id() RETURNS integer
+CREATE FUNCTION app_public.current_user_id() RETURNS integer
     LANGUAGE sql STABLE
     SET search_path TO "$user", public
     AS $$
@@ -808,7 +801,7 @@ $$;
 -- Name: FUNCTION current_user_id(); Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON FUNCTION current_user_id() IS '@omit
+COMMENT ON FUNCTION app_public.current_user_id() IS '@omit
 Handy method to get the current user ID for use in RLS policies, etc; in GraphQL, use `currentUser{id}` instead.';
 
 
@@ -816,7 +809,7 @@ Handy method to get the current user ID for use in RLS policies, etc; in GraphQL
 -- Name: current_user_is_admin(); Type: FUNCTION; Schema: app_public; Owner: -
 --
 
-CREATE FUNCTION current_user_is_admin() RETURNS boolean
+CREATE FUNCTION app_public.current_user_is_admin() RETURNS boolean
     LANGUAGE sql STABLE
     SET search_path TO "$user", public
     AS $$
@@ -831,7 +824,7 @@ $$;
 -- Name: FUNCTION current_user_is_admin(); Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON FUNCTION current_user_is_admin() IS '@omit
+COMMENT ON FUNCTION app_public.current_user_is_admin() IS '@omit
 Handy method to determine if the current user is an admin, for use in RLS policies, etc; in GraphQL should use `currentUser{isAdmin}` instead.';
 
 
@@ -839,7 +832,7 @@ Handy method to determine if the current user is an admin, for use in RLS polici
 -- Name: forgot_password(text); Type: FUNCTION; Schema: app_public; Owner: -
 --
 
-CREATE FUNCTION forgot_password(email text) RETURNS boolean
+CREATE FUNCTION app_public.forgot_password(email text) RETURNS boolean
     LANGUAGE plpgsql STRICT SECURITY DEFINER
     SET search_path TO "$user", public
     AS $$
@@ -906,7 +899,7 @@ $$;
 -- Name: FUNCTION forgot_password(email text); Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON FUNCTION forgot_password(email text) IS '@resultFieldName success
+COMMENT ON FUNCTION app_public.forgot_password(email text) IS '@resultFieldName success
 If you''ve forgotten your password, give us one of your email addresses and we'' send you a reset token. Note this only works if you have added an email address!';
 
 
@@ -914,7 +907,7 @@ If you''ve forgotten your password, give us one of your email addresses and we''
 -- Name: forums; Type: TABLE; Schema: app_public; Owner: -
 --
 
-CREATE TABLE forums (
+CREATE TABLE app_public.forums (
     id integer NOT NULL,
     slug text NOT NULL,
     name text NOT NULL,
@@ -930,35 +923,35 @@ CREATE TABLE forums (
 -- Name: TABLE forums; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON TABLE forums IS 'A subject-based grouping of topics and posts.';
+COMMENT ON TABLE app_public.forums IS 'A subject-based grouping of topics and posts.';
 
 
 --
 -- Name: COLUMN forums.slug; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN forums.slug IS 'An URL-safe alias for the `Forum`.';
+COMMENT ON COLUMN app_public.forums.slug IS 'An URL-safe alias for the `Forum`.';
 
 
 --
 -- Name: COLUMN forums.name; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN forums.name IS 'The name of the `Forum` (indicates its subject matter).';
+COMMENT ON COLUMN app_public.forums.name IS 'The name of the `Forum` (indicates its subject matter).';
 
 
 --
 -- Name: COLUMN forums.description; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN forums.description IS 'A brief description of the `Forum` including it''s purpose.';
+COMMENT ON COLUMN app_public.forums.description IS 'A brief description of the `Forum` including it''s purpose.';
 
 
 --
 -- Name: forums_about_cats(); Type: FUNCTION; Schema: app_public; Owner: -
 --
 
-CREATE FUNCTION forums_about_cats() RETURNS SETOF forums
+CREATE FUNCTION app_public.forums_about_cats() RETURNS SETOF app_public.forums
     LANGUAGE sql STABLE
     AS $$
   select * from app_public.forums where slug like 'cat-%';
@@ -969,7 +962,7 @@ $$;
 -- Name: random_number(); Type: FUNCTION; Schema: app_public; Owner: -
 --
 
-CREATE FUNCTION random_number() RETURNS integer
+CREATE FUNCTION app_public.random_number() RETURNS integer
     LANGUAGE sql STABLE
     AS $$
   select 4;
@@ -980,14 +973,14 @@ $$;
 -- Name: FUNCTION random_number(); Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON FUNCTION random_number() IS 'Chosen by fair dice roll. Guaranteed to be random. XKCD#221';
+COMMENT ON FUNCTION app_public.random_number() IS 'Chosen by fair dice roll. Guaranteed to be random. XKCD#221';
 
 
 --
 -- Name: reset_password(integer, text, text); Type: FUNCTION; Schema: app_public; Owner: -
 --
 
-CREATE FUNCTION reset_password(user_id integer, reset_token text, new_password text) RETURNS users
+CREATE FUNCTION app_public.reset_password(user_id integer, reset_token text, new_password text) RETURNS app_public.users
     LANGUAGE plpgsql STRICT SECURITY DEFINER
     SET search_path TO "$user", public
     AS $$
@@ -1051,17 +1044,17 @@ $$;
 -- Name: FUNCTION reset_password(user_id integer, reset_token text, new_password text); Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON FUNCTION reset_password(user_id integer, reset_token text, new_password text) IS 'After triggering forgotPassword, you''ll be sent a reset token. Combine this with your user ID and a new password to reset your password.';
+COMMENT ON FUNCTION app_public.reset_password(user_id integer, reset_token text, new_password text) IS 'After triggering forgotPassword, you''ll be sent a reset token. Combine this with your user ID and a new password to reset your password.';
 
 
 --
 -- Name: topics; Type: TABLE; Schema: app_public; Owner: -
 --
 
-CREATE TABLE topics (
+CREATE TABLE app_public.topics (
     id integer NOT NULL,
     forum_id integer NOT NULL,
-    author_id integer DEFAULT current_user_id() NOT NULL,
+    author_id integer DEFAULT app_public.current_user_id() NOT NULL,
     title text NOT NULL,
     body text DEFAULT ''::text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
@@ -1074,7 +1067,7 @@ CREATE TABLE topics (
 -- Name: TABLE topics; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON TABLE topics IS '@omit all
+COMMENT ON TABLE app_public.topics IS '@omit all
 An individual message thread within a Forum.';
 
 
@@ -1082,21 +1075,21 @@ An individual message thread within a Forum.';
 -- Name: COLUMN topics.title; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN topics.title IS 'The title of the `Topic`.';
+COMMENT ON COLUMN app_public.topics.title IS 'The title of the `Topic`.';
 
 
 --
 -- Name: COLUMN topics.body; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN topics.body IS 'The body of the `Topic`, which Posts reply to.';
+COMMENT ON COLUMN app_public.topics.body IS 'The body of the `Topic`, which Posts reply to.';
 
 
 --
--- Name: topics_body_summary(topics, integer); Type: FUNCTION; Schema: app_public; Owner: -
+-- Name: topics_body_summary(app_public.topics, integer); Type: FUNCTION; Schema: app_public; Owner: -
 --
 
-CREATE FUNCTION topics_body_summary(t topics, max_length integer DEFAULT 30) RETURNS text
+CREATE FUNCTION app_public.topics_body_summary(t app_public.topics, max_length integer DEFAULT 30) RETURNS text
     LANGUAGE sql STABLE
     SET search_path TO "$user", public
     AS $$
@@ -1108,13 +1101,11 @@ CREATE FUNCTION topics_body_summary(t topics, max_length integer DEFAULT 30) RET
 $$;
 
 
-SET search_path = app_jobs, pg_catalog;
-
 --
 -- Name: job_queues; Type: TABLE; Schema: app_jobs; Owner: -
 --
 
-CREATE TABLE job_queues (
+CREATE TABLE app_jobs.job_queues (
     queue_name character varying NOT NULL,
     job_count integer DEFAULT 0 NOT NULL,
     locked_at timestamp with time zone,
@@ -1126,7 +1117,7 @@ CREATE TABLE job_queues (
 -- Name: jobs_id_seq; Type: SEQUENCE; Schema: app_jobs; Owner: -
 --
 
-CREATE SEQUENCE jobs_id_seq
+CREATE SEQUENCE app_jobs.jobs_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1139,16 +1130,14 @@ CREATE SEQUENCE jobs_id_seq
 -- Name: jobs_id_seq; Type: SEQUENCE OWNED BY; Schema: app_jobs; Owner: -
 --
 
-ALTER SEQUENCE jobs_id_seq OWNED BY jobs.id;
+ALTER SEQUENCE app_jobs.jobs_id_seq OWNED BY app_jobs.jobs.id;
 
-
-SET search_path = app_private, pg_catalog;
 
 --
 -- Name: user_authentication_secrets; Type: TABLE; Schema: app_private; Owner: -
 --
 
-CREATE TABLE user_authentication_secrets (
+CREATE TABLE app_private.user_authentication_secrets (
     user_authentication_id integer NOT NULL,
     details jsonb DEFAULT '{}'::jsonb NOT NULL
 );
@@ -1158,7 +1147,7 @@ CREATE TABLE user_authentication_secrets (
 -- Name: user_email_secrets; Type: TABLE; Schema: app_private; Owner: -
 --
 
-CREATE TABLE user_email_secrets (
+CREATE TABLE app_private.user_email_secrets (
     user_email_id integer NOT NULL,
     verification_token text,
     password_reset_email_sent_at timestamp with time zone
@@ -1169,21 +1158,21 @@ CREATE TABLE user_email_secrets (
 -- Name: TABLE user_email_secrets; Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON TABLE user_email_secrets IS 'The contents of this table should never be visible to the user. Contains data mostly related to email verification and avoiding spamming users.';
+COMMENT ON TABLE app_private.user_email_secrets IS 'The contents of this table should never be visible to the user. Contains data mostly related to email verification and avoiding spamming users.';
 
 
 --
 -- Name: COLUMN user_email_secrets.password_reset_email_sent_at; Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON COLUMN user_email_secrets.password_reset_email_sent_at IS 'We store the time the last password reset was sent to this email to prevent the email getting flooded.';
+COMMENT ON COLUMN app_private.user_email_secrets.password_reset_email_sent_at IS 'We store the time the last password reset was sent to this email to prevent the email getting flooded.';
 
 
 --
 -- Name: user_secrets; Type: TABLE; Schema: app_private; Owner: -
 --
 
-CREATE TABLE user_secrets (
+CREATE TABLE app_private.user_secrets (
     user_id integer NOT NULL,
     password_hash text,
     password_attempts integer DEFAULT 0 NOT NULL,
@@ -1199,16 +1188,14 @@ CREATE TABLE user_secrets (
 -- Name: TABLE user_secrets; Type: COMMENT; Schema: app_private; Owner: -
 --
 
-COMMENT ON TABLE user_secrets IS 'The contents of this table should never be visible to the user. Contains data mostly related to authentication.';
+COMMENT ON TABLE app_private.user_secrets IS 'The contents of this table should never be visible to the user. Contains data mostly related to authentication.';
 
-
-SET search_path = app_public, pg_catalog;
 
 --
 -- Name: forums_id_seq; Type: SEQUENCE; Schema: app_public; Owner: -
 --
 
-CREATE SEQUENCE forums_id_seq
+CREATE SEQUENCE app_public.forums_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1221,17 +1208,17 @@ CREATE SEQUENCE forums_id_seq
 -- Name: forums_id_seq; Type: SEQUENCE OWNED BY; Schema: app_public; Owner: -
 --
 
-ALTER SEQUENCE forums_id_seq OWNED BY forums.id;
+ALTER SEQUENCE app_public.forums_id_seq OWNED BY app_public.forums.id;
 
 
 --
 -- Name: posts; Type: TABLE; Schema: app_public; Owner: -
 --
 
-CREATE TABLE posts (
+CREATE TABLE app_public.posts (
     id integer NOT NULL,
     topic_id integer NOT NULL,
-    author_id integer DEFAULT current_user_id() NOT NULL,
+    author_id integer DEFAULT app_public.current_user_id() NOT NULL,
     body text DEFAULT ''::text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
@@ -1242,7 +1229,7 @@ CREATE TABLE posts (
 -- Name: TABLE posts; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON TABLE posts IS '@omit all
+COMMENT ON TABLE app_public.posts IS '@omit all
 An individual message thread within a Forum.';
 
 
@@ -1250,49 +1237,49 @@ An individual message thread within a Forum.';
 -- Name: COLUMN posts.id; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN posts.id IS '@omit create,update';
+COMMENT ON COLUMN app_public.posts.id IS '@omit create,update';
 
 
 --
 -- Name: COLUMN posts.topic_id; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN posts.topic_id IS '@omit update';
+COMMENT ON COLUMN app_public.posts.topic_id IS '@omit update';
 
 
 --
 -- Name: COLUMN posts.author_id; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN posts.author_id IS '@omit create,update';
+COMMENT ON COLUMN app_public.posts.author_id IS '@omit create,update';
 
 
 --
 -- Name: COLUMN posts.body; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN posts.body IS 'The body of the `Topic`, which Posts reply to.';
+COMMENT ON COLUMN app_public.posts.body IS 'The body of the `Topic`, which Posts reply to.';
 
 
 --
 -- Name: COLUMN posts.created_at; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN posts.created_at IS '@omit create,update';
+COMMENT ON COLUMN app_public.posts.created_at IS '@omit create,update';
 
 
 --
 -- Name: COLUMN posts.updated_at; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN posts.updated_at IS '@omit create,update';
+COMMENT ON COLUMN app_public.posts.updated_at IS '@omit create,update';
 
 
 --
 -- Name: posts_id_seq; Type: SEQUENCE; Schema: app_public; Owner: -
 --
 
-CREATE SEQUENCE posts_id_seq
+CREATE SEQUENCE app_public.posts_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1305,14 +1292,14 @@ CREATE SEQUENCE posts_id_seq
 -- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: app_public; Owner: -
 --
 
-ALTER SEQUENCE posts_id_seq OWNED BY posts.id;
+ALTER SEQUENCE app_public.posts_id_seq OWNED BY app_public.posts.id;
 
 
 --
 -- Name: topics_id_seq; Type: SEQUENCE; Schema: app_public; Owner: -
 --
 
-CREATE SEQUENCE topics_id_seq
+CREATE SEQUENCE app_public.topics_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1325,14 +1312,14 @@ CREATE SEQUENCE topics_id_seq
 -- Name: topics_id_seq; Type: SEQUENCE OWNED BY; Schema: app_public; Owner: -
 --
 
-ALTER SEQUENCE topics_id_seq OWNED BY topics.id;
+ALTER SEQUENCE app_public.topics_id_seq OWNED BY app_public.topics.id;
 
 
 --
 -- Name: user_authentications; Type: TABLE; Schema: app_public; Owner: -
 --
 
-CREATE TABLE user_authentications (
+CREATE TABLE app_public.user_authentications (
     id integer NOT NULL,
     user_id integer NOT NULL,
     service text NOT NULL,
@@ -1347,7 +1334,7 @@ CREATE TABLE user_authentications (
 -- Name: TABLE user_authentications; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON TABLE user_authentications IS '@omit all
+COMMENT ON TABLE app_public.user_authentications IS '@omit all
 Contains information about the login providers this user has used, so that they may disconnect them should they wish.';
 
 
@@ -1355,28 +1342,28 @@ Contains information about the login providers this user has used, so that they 
 -- Name: COLUMN user_authentications.user_id; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN user_authentications.user_id IS '@omit';
+COMMENT ON COLUMN app_public.user_authentications.user_id IS '@omit';
 
 
 --
 -- Name: COLUMN user_authentications.service; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN user_authentications.service IS 'The login service used, e.g. `twitter` or `github`.';
+COMMENT ON COLUMN app_public.user_authentications.service IS 'The login service used, e.g. `twitter` or `github`.';
 
 
 --
 -- Name: COLUMN user_authentications.identifier; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN user_authentications.identifier IS 'A unique identifier for the user within the login service.';
+COMMENT ON COLUMN app_public.user_authentications.identifier IS 'A unique identifier for the user within the login service.';
 
 
 --
 -- Name: COLUMN user_authentications.details; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN user_authentications.details IS '@omit
+COMMENT ON COLUMN app_public.user_authentications.details IS '@omit
 Additional profile details extracted from this login method';
 
 
@@ -1384,7 +1371,7 @@ Additional profile details extracted from this login method';
 -- Name: user_authentications_id_seq; Type: SEQUENCE; Schema: app_public; Owner: -
 --
 
-CREATE SEQUENCE user_authentications_id_seq
+CREATE SEQUENCE app_public.user_authentications_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1397,16 +1384,16 @@ CREATE SEQUENCE user_authentications_id_seq
 -- Name: user_authentications_id_seq; Type: SEQUENCE OWNED BY; Schema: app_public; Owner: -
 --
 
-ALTER SEQUENCE user_authentications_id_seq OWNED BY user_authentications.id;
+ALTER SEQUENCE app_public.user_authentications_id_seq OWNED BY app_public.user_authentications.id;
 
 
 --
 -- Name: user_emails; Type: TABLE; Schema: app_public; Owner: -
 --
 
-CREATE TABLE user_emails (
+CREATE TABLE app_public.user_emails (
     id integer NOT NULL,
-    user_id integer DEFAULT current_user_id() NOT NULL,
+    user_id integer DEFAULT app_public.current_user_id() NOT NULL,
     email public.citext NOT NULL,
     is_verified boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
@@ -1419,7 +1406,7 @@ CREATE TABLE user_emails (
 -- Name: TABLE user_emails; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON TABLE user_emails IS '@omit all
+COMMENT ON TABLE app_public.user_emails IS '@omit all
 Information about a user''s email address.';
 
 
@@ -1427,21 +1414,21 @@ Information about a user''s email address.';
 -- Name: COLUMN user_emails.email; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN user_emails.email IS 'The users email address, in `a@b.c` format.';
+COMMENT ON COLUMN app_public.user_emails.email IS 'The users email address, in `a@b.c` format.';
 
 
 --
 -- Name: COLUMN user_emails.is_verified; Type: COMMENT; Schema: app_public; Owner: -
 --
 
-COMMENT ON COLUMN user_emails.is_verified IS 'True if the user has is_verified their email address (by clicking the link in the email we sent them, or logging in with a social login provider), false otherwise.';
+COMMENT ON COLUMN app_public.user_emails.is_verified IS 'True if the user has is_verified their email address (by clicking the link in the email we sent them, or logging in with a social login provider), false otherwise.';
 
 
 --
 -- Name: user_emails_id_seq; Type: SEQUENCE; Schema: app_public; Owner: -
 --
 
-CREATE SEQUENCE user_emails_id_seq
+CREATE SEQUENCE app_public.user_emails_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1454,14 +1441,14 @@ CREATE SEQUENCE user_emails_id_seq
 -- Name: user_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: app_public; Owner: -
 --
 
-ALTER SEQUENCE user_emails_id_seq OWNED BY user_emails.id;
+ALTER SEQUENCE app_public.user_emails_id_seq OWNED BY app_public.user_emails.id;
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: app_public; Owner: -
 --
 
-CREATE SEQUENCE users_id_seq
+CREATE SEQUENCE app_public.users_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1474,69 +1461,63 @@ CREATE SEQUENCE users_id_seq
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: app_public; Owner: -
 --
 
-ALTER SEQUENCE users_id_seq OWNED BY users.id;
+ALTER SEQUENCE app_public.users_id_seq OWNED BY app_public.users.id;
 
-
-SET search_path = app_jobs, pg_catalog;
 
 --
 -- Name: jobs id; Type: DEFAULT; Schema: app_jobs; Owner: -
 --
 
-ALTER TABLE ONLY jobs ALTER COLUMN id SET DEFAULT nextval('jobs_id_seq'::regclass);
+ALTER TABLE ONLY app_jobs.jobs ALTER COLUMN id SET DEFAULT nextval('app_jobs.jobs_id_seq'::regclass);
 
-
-SET search_path = app_public, pg_catalog;
 
 --
 -- Name: forums id; Type: DEFAULT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY forums ALTER COLUMN id SET DEFAULT nextval('forums_id_seq'::regclass);
+ALTER TABLE ONLY app_public.forums ALTER COLUMN id SET DEFAULT nextval('app_public.forums_id_seq'::regclass);
 
 
 --
 -- Name: posts id; Type: DEFAULT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY posts ALTER COLUMN id SET DEFAULT nextval('posts_id_seq'::regclass);
+ALTER TABLE ONLY app_public.posts ALTER COLUMN id SET DEFAULT nextval('app_public.posts_id_seq'::regclass);
 
 
 --
 -- Name: topics id; Type: DEFAULT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY topics ALTER COLUMN id SET DEFAULT nextval('topics_id_seq'::regclass);
+ALTER TABLE ONLY app_public.topics ALTER COLUMN id SET DEFAULT nextval('app_public.topics_id_seq'::regclass);
 
 
 --
 -- Name: user_authentications id; Type: DEFAULT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY user_authentications ALTER COLUMN id SET DEFAULT nextval('user_authentications_id_seq'::regclass);
+ALTER TABLE ONLY app_public.user_authentications ALTER COLUMN id SET DEFAULT nextval('app_public.user_authentications_id_seq'::regclass);
 
 
 --
 -- Name: user_emails id; Type: DEFAULT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY user_emails ALTER COLUMN id SET DEFAULT nextval('user_emails_id_seq'::regclass);
+ALTER TABLE ONLY app_public.user_emails ALTER COLUMN id SET DEFAULT nextval('app_public.user_emails_id_seq'::regclass);
 
 
 --
 -- Name: users id; Type: DEFAULT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+ALTER TABLE ONLY app_public.users ALTER COLUMN id SET DEFAULT nextval('app_public.users_id_seq'::regclass);
 
-
-SET search_path = app_jobs, pg_catalog;
 
 --
 -- Name: job_queues job_queues_pkey; Type: CONSTRAINT; Schema: app_jobs; Owner: -
 --
 
-ALTER TABLE ONLY job_queues
+ALTER TABLE ONLY app_jobs.job_queues
     ADD CONSTRAINT job_queues_pkey PRIMARY KEY (queue_name);
 
 
@@ -1544,17 +1525,15 @@ ALTER TABLE ONLY job_queues
 -- Name: jobs jobs_pkey; Type: CONSTRAINT; Schema: app_jobs; Owner: -
 --
 
-ALTER TABLE ONLY jobs
+ALTER TABLE ONLY app_jobs.jobs
     ADD CONSTRAINT jobs_pkey PRIMARY KEY (id);
 
-
-SET search_path = app_private, pg_catalog;
 
 --
 -- Name: user_authentication_secrets user_authentication_secrets_pkey; Type: CONSTRAINT; Schema: app_private; Owner: -
 --
 
-ALTER TABLE ONLY user_authentication_secrets
+ALTER TABLE ONLY app_private.user_authentication_secrets
     ADD CONSTRAINT user_authentication_secrets_pkey PRIMARY KEY (user_authentication_id);
 
 
@@ -1562,7 +1541,7 @@ ALTER TABLE ONLY user_authentication_secrets
 -- Name: user_email_secrets user_email_secrets_pkey; Type: CONSTRAINT; Schema: app_private; Owner: -
 --
 
-ALTER TABLE ONLY user_email_secrets
+ALTER TABLE ONLY app_private.user_email_secrets
     ADD CONSTRAINT user_email_secrets_pkey PRIMARY KEY (user_email_id);
 
 
@@ -1570,17 +1549,15 @@ ALTER TABLE ONLY user_email_secrets
 -- Name: user_secrets user_secrets_pkey; Type: CONSTRAINT; Schema: app_private; Owner: -
 --
 
-ALTER TABLE ONLY user_secrets
+ALTER TABLE ONLY app_private.user_secrets
     ADD CONSTRAINT user_secrets_pkey PRIMARY KEY (user_id);
 
-
-SET search_path = app_public, pg_catalog;
 
 --
 -- Name: forums forums_pkey; Type: CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY forums
+ALTER TABLE ONLY app_public.forums
     ADD CONSTRAINT forums_pkey PRIMARY KEY (id);
 
 
@@ -1588,7 +1565,7 @@ ALTER TABLE ONLY forums
 -- Name: forums forums_slug_key; Type: CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY forums
+ALTER TABLE ONLY app_public.forums
     ADD CONSTRAINT forums_slug_key UNIQUE (slug);
 
 
@@ -1596,7 +1573,7 @@ ALTER TABLE ONLY forums
 -- Name: posts posts_pkey; Type: CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY posts
+ALTER TABLE ONLY app_public.posts
     ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
 
 
@@ -1604,7 +1581,7 @@ ALTER TABLE ONLY posts
 -- Name: topics topics_pkey; Type: CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY topics
+ALTER TABLE ONLY app_public.topics
     ADD CONSTRAINT topics_pkey PRIMARY KEY (id);
 
 
@@ -1612,7 +1589,7 @@ ALTER TABLE ONLY topics
 -- Name: user_authentications uniq_user_authentications; Type: CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY user_authentications
+ALTER TABLE ONLY app_public.user_authentications
     ADD CONSTRAINT uniq_user_authentications UNIQUE (service, identifier);
 
 
@@ -1620,7 +1597,7 @@ ALTER TABLE ONLY user_authentications
 -- Name: user_authentications user_authentications_pkey; Type: CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY user_authentications
+ALTER TABLE ONLY app_public.user_authentications
     ADD CONSTRAINT user_authentications_pkey PRIMARY KEY (id);
 
 
@@ -1628,7 +1605,7 @@ ALTER TABLE ONLY user_authentications
 -- Name: user_emails user_emails_pkey; Type: CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY user_emails
+ALTER TABLE ONLY app_public.user_emails
     ADD CONSTRAINT user_emails_pkey PRIMARY KEY (id);
 
 
@@ -1636,7 +1613,7 @@ ALTER TABLE ONLY user_emails
 -- Name: user_emails user_emails_user_id_email_key; Type: CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY user_emails
+ALTER TABLE ONLY app_public.user_emails
     ADD CONSTRAINT user_emails_user_id_email_key UNIQUE (user_id, email);
 
 
@@ -1644,7 +1621,7 @@ ALTER TABLE ONLY user_emails
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY users
+ALTER TABLE ONLY app_public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
@@ -1652,7 +1629,7 @@ ALTER TABLE ONLY users
 -- Name: users users_username_key; Type: CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY users
+ALTER TABLE ONLY app_public.users
     ADD CONSTRAINT users_username_key UNIQUE (username);
 
 
@@ -1660,118 +1637,112 @@ ALTER TABLE ONLY users
 -- Name: uniq_user_emails_verified_email; Type: INDEX; Schema: app_public; Owner: -
 --
 
-CREATE UNIQUE INDEX uniq_user_emails_verified_email ON user_emails USING btree (email) WHERE (is_verified IS TRUE);
+CREATE UNIQUE INDEX uniq_user_emails_verified_email ON app_public.user_emails USING btree (email) WHERE (is_verified IS TRUE);
 
-
-SET search_path = app_jobs, pg_catalog;
 
 --
 -- Name: jobs _100_timestamps; Type: TRIGGER; Schema: app_jobs; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps BEFORE INSERT OR UPDATE ON jobs FOR EACH ROW EXECUTE PROCEDURE update_timestamps();
+CREATE TRIGGER _100_timestamps BEFORE INSERT OR UPDATE ON app_jobs.jobs FOR EACH ROW EXECUTE PROCEDURE app_jobs.update_timestamps();
 
 
 --
 -- Name: jobs _500_decrease_job_queue_count; Type: TRIGGER; Schema: app_jobs; Owner: -
 --
 
-CREATE TRIGGER _500_decrease_job_queue_count BEFORE DELETE ON jobs FOR EACH ROW EXECUTE PROCEDURE jobs__decrease_job_queue_count();
+CREATE TRIGGER _500_decrease_job_queue_count BEFORE DELETE ON app_jobs.jobs FOR EACH ROW EXECUTE PROCEDURE app_jobs.jobs__decrease_job_queue_count();
 
 
 --
 -- Name: jobs _500_increase_job_queue_count; Type: TRIGGER; Schema: app_jobs; Owner: -
 --
 
-CREATE TRIGGER _500_increase_job_queue_count AFTER INSERT ON jobs FOR EACH ROW EXECUTE PROCEDURE jobs__increase_job_queue_count();
+CREATE TRIGGER _500_increase_job_queue_count AFTER INSERT ON app_jobs.jobs FOR EACH ROW EXECUTE PROCEDURE app_jobs.jobs__increase_job_queue_count();
 
 
 --
 -- Name: jobs _900_notify_worker; Type: TRIGGER; Schema: app_jobs; Owner: -
 --
 
-CREATE TRIGGER _900_notify_worker AFTER INSERT ON jobs FOR EACH STATEMENT EXECUTE PROCEDURE do_notify('jobs:insert');
+CREATE TRIGGER _900_notify_worker AFTER INSERT ON app_jobs.jobs FOR EACH STATEMENT EXECUTE PROCEDURE app_jobs.do_notify('jobs:insert');
 
-
-SET search_path = app_public, pg_catalog;
 
 --
 -- Name: users _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.users FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: user_emails _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON user_emails FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.user_emails FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: user_authentications _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON user_authentications FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.user_authentications FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: forums _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON forums FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.forums FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: topics _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON topics FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.topics FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: posts _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON posts FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.posts FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: users _200_make_first_user_admin; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _200_make_first_user_admin BEFORE INSERT ON users FOR EACH ROW EXECUTE PROCEDURE app_private.tg_users__make_first_user_admin();
+CREATE TRIGGER _200_make_first_user_admin BEFORE INSERT ON app_public.users FOR EACH ROW EXECUTE PROCEDURE app_private.tg_users__make_first_user_admin();
 
 
 --
 -- Name: users _500_insert_secrets; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _500_insert_secrets AFTER INSERT ON users FOR EACH ROW EXECUTE PROCEDURE app_private.tg_user_secrets__insert_with_user();
+CREATE TRIGGER _500_insert_secrets AFTER INSERT ON app_public.users FOR EACH ROW EXECUTE PROCEDURE app_private.tg_user_secrets__insert_with_user();
 
 
 --
 -- Name: user_emails _500_insert_secrets; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _500_insert_secrets AFTER INSERT ON user_emails FOR EACH ROW EXECUTE PROCEDURE app_private.tg_user_email_secrets__insert_with_user_email();
+CREATE TRIGGER _500_insert_secrets AFTER INSERT ON app_public.user_emails FOR EACH ROW EXECUTE PROCEDURE app_private.tg_user_email_secrets__insert_with_user_email();
 
 
 --
 -- Name: user_emails _900_send_verification_email; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _900_send_verification_email AFTER INSERT ON user_emails FOR EACH ROW WHEN ((new.is_verified IS FALSE)) EXECUTE PROCEDURE app_private.tg__add_job_for_row('user_emails__send_verification');
+CREATE TRIGGER _900_send_verification_email AFTER INSERT ON app_public.user_emails FOR EACH ROW WHEN ((new.is_verified IS FALSE)) EXECUTE PROCEDURE app_private.tg__add_job_for_row('user_emails__send_verification');
 
-
-SET search_path = app_private, pg_catalog;
 
 --
 -- Name: user_authentication_secrets user_authentication_secrets_user_authentication_id_fkey; Type: FK CONSTRAINT; Schema: app_private; Owner: -
 --
 
-ALTER TABLE ONLY user_authentication_secrets
+ALTER TABLE ONLY app_private.user_authentication_secrets
     ADD CONSTRAINT user_authentication_secrets_user_authentication_id_fkey FOREIGN KEY (user_authentication_id) REFERENCES app_public.user_authentications(id) ON DELETE CASCADE;
 
 
@@ -1779,7 +1750,7 @@ ALTER TABLE ONLY user_authentication_secrets
 -- Name: user_email_secrets user_email_secrets_user_email_id_fkey; Type: FK CONSTRAINT; Schema: app_private; Owner: -
 --
 
-ALTER TABLE ONLY user_email_secrets
+ALTER TABLE ONLY app_private.user_email_secrets
     ADD CONSTRAINT user_email_secrets_user_email_id_fkey FOREIGN KEY (user_email_id) REFERENCES app_public.user_emails(id) ON DELETE CASCADE;
 
 
@@ -1787,426 +1758,418 @@ ALTER TABLE ONLY user_email_secrets
 -- Name: user_secrets user_secrets_user_id_fkey; Type: FK CONSTRAINT; Schema: app_private; Owner: -
 --
 
-ALTER TABLE ONLY user_secrets
+ALTER TABLE ONLY app_private.user_secrets
     ADD CONSTRAINT user_secrets_user_id_fkey FOREIGN KEY (user_id) REFERENCES app_public.users(id);
 
-
-SET search_path = app_public, pg_catalog;
 
 --
 -- Name: posts posts_author_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY posts
-    ADD CONSTRAINT posts_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE;
+ALTER TABLE ONLY app_public.posts
+    ADD CONSTRAINT posts_author_id_fkey FOREIGN KEY (author_id) REFERENCES app_public.users(id) ON DELETE CASCADE;
 
 
 --
 -- Name: posts posts_topic_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY posts
-    ADD CONSTRAINT posts_topic_id_fkey FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE;
+ALTER TABLE ONLY app_public.posts
+    ADD CONSTRAINT posts_topic_id_fkey FOREIGN KEY (topic_id) REFERENCES app_public.topics(id) ON DELETE CASCADE;
 
 
 --
 -- Name: topics topics_author_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY topics
-    ADD CONSTRAINT topics_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE;
+ALTER TABLE ONLY app_public.topics
+    ADD CONSTRAINT topics_author_id_fkey FOREIGN KEY (author_id) REFERENCES app_public.users(id) ON DELETE CASCADE;
 
 
 --
 -- Name: topics topics_forum_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY topics
-    ADD CONSTRAINT topics_forum_id_fkey FOREIGN KEY (forum_id) REFERENCES forums(id) ON DELETE CASCADE;
+ALTER TABLE ONLY app_public.topics
+    ADD CONSTRAINT topics_forum_id_fkey FOREIGN KEY (forum_id) REFERENCES app_public.forums(id) ON DELETE CASCADE;
 
 
 --
 -- Name: user_authentications user_authentications_user_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY user_authentications
-    ADD CONSTRAINT user_authentications_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+ALTER TABLE ONLY app_public.user_authentications
+    ADD CONSTRAINT user_authentications_user_id_fkey FOREIGN KEY (user_id) REFERENCES app_public.users(id) ON DELETE CASCADE;
 
 
 --
 -- Name: user_emails user_emails_user_id_fkey; Type: FK CONSTRAINT; Schema: app_public; Owner: -
 --
 
-ALTER TABLE ONLY user_emails
-    ADD CONSTRAINT user_emails_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+ALTER TABLE ONLY app_public.user_emails
+    ADD CONSTRAINT user_emails_user_id_fkey FOREIGN KEY (user_id) REFERENCES app_public.users(id) ON DELETE CASCADE;
 
-
-SET search_path = app_jobs, pg_catalog;
 
 --
 -- Name: job_queues; Type: ROW SECURITY; Schema: app_jobs; Owner: -
 --
 
-ALTER TABLE job_queues ENABLE ROW LEVEL SECURITY;
-
-SET search_path = app_private, pg_catalog;
+ALTER TABLE app_jobs.job_queues ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: user_authentication_secrets; Type: ROW SECURITY; Schema: app_private; Owner: -
 --
 
-ALTER TABLE user_authentication_secrets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_private.user_authentication_secrets ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: user_email_secrets; Type: ROW SECURITY; Schema: app_private; Owner: -
 --
 
-ALTER TABLE user_email_secrets ENABLE ROW LEVEL SECURITY;
-
-SET search_path = app_public, pg_catalog;
+ALTER TABLE app_private.user_email_secrets ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: forums delete_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY delete_admin ON forums FOR DELETE USING (current_user_is_admin());
+CREATE POLICY delete_admin ON app_public.forums FOR DELETE USING (app_public.current_user_is_admin());
 
 
 --
 -- Name: topics delete_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY delete_admin ON topics FOR DELETE USING (((author_id = current_user_id()) OR current_user_is_admin()));
+CREATE POLICY delete_admin ON app_public.topics FOR DELETE USING (((author_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
 
 
 --
 -- Name: posts delete_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY delete_admin ON posts FOR DELETE USING (((author_id = current_user_id()) OR current_user_is_admin()));
+CREATE POLICY delete_admin ON app_public.posts FOR DELETE USING (((author_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
 
 
 --
 -- Name: user_emails delete_own; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY delete_own ON user_emails FOR DELETE USING ((user_id = current_user_id()));
+CREATE POLICY delete_own ON app_public.user_emails FOR DELETE USING ((user_id = app_public.current_user_id()));
 
 
 --
 -- Name: user_authentications delete_own; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY delete_own ON user_authentications FOR DELETE USING ((user_id = current_user_id()));
+CREATE POLICY delete_own ON app_public.user_authentications FOR DELETE USING ((user_id = app_public.current_user_id()));
 
 
 --
 -- Name: users delete_self; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY delete_self ON users FOR DELETE USING ((id = current_user_id()));
+CREATE POLICY delete_self ON app_public.users FOR DELETE USING ((id = app_public.current_user_id()));
 
 
 --
 -- Name: forums; Type: ROW SECURITY; Schema: app_public; Owner: -
 --
 
-ALTER TABLE forums ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_public.forums ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: forums insert_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY insert_admin ON forums FOR INSERT WITH CHECK (current_user_is_admin());
+CREATE POLICY insert_admin ON app_public.forums FOR INSERT WITH CHECK (app_public.current_user_is_admin());
 
 
 --
 -- Name: topics insert_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY insert_admin ON topics FOR INSERT WITH CHECK ((author_id = current_user_id()));
+CREATE POLICY insert_admin ON app_public.topics FOR INSERT WITH CHECK ((author_id = app_public.current_user_id()));
 
 
 --
 -- Name: posts insert_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY insert_admin ON posts FOR INSERT WITH CHECK ((author_id = current_user_id()));
+CREATE POLICY insert_admin ON app_public.posts FOR INSERT WITH CHECK ((author_id = app_public.current_user_id()));
 
 
 --
 -- Name: user_emails insert_own; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY insert_own ON user_emails FOR INSERT WITH CHECK ((user_id = current_user_id()));
+CREATE POLICY insert_own ON app_public.user_emails FOR INSERT WITH CHECK ((user_id = app_public.current_user_id()));
 
 
 --
 -- Name: posts; Type: ROW SECURITY; Schema: app_public; Owner: -
 --
 
-ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_public.posts ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: users select_all; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY select_all ON users FOR SELECT USING (true);
+CREATE POLICY select_all ON app_public.users FOR SELECT USING (true);
 
 
 --
 -- Name: forums select_all; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY select_all ON forums FOR SELECT USING (true);
+CREATE POLICY select_all ON app_public.forums FOR SELECT USING (true);
 
 
 --
 -- Name: topics select_all; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY select_all ON topics FOR SELECT USING (true);
+CREATE POLICY select_all ON app_public.topics FOR SELECT USING (true);
 
 
 --
 -- Name: posts select_all; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY select_all ON posts FOR SELECT USING (true);
+CREATE POLICY select_all ON app_public.posts FOR SELECT USING (true);
 
 
 --
 -- Name: user_emails select_own; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY select_own ON user_emails FOR SELECT USING ((user_id = current_user_id()));
+CREATE POLICY select_own ON app_public.user_emails FOR SELECT USING ((user_id = app_public.current_user_id()));
 
 
 --
 -- Name: user_authentications select_own; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY select_own ON user_authentications FOR SELECT USING ((user_id = current_user_id()));
+CREATE POLICY select_own ON app_public.user_authentications FOR SELECT USING ((user_id = app_public.current_user_id()));
 
 
 --
 -- Name: topics; Type: ROW SECURITY; Schema: app_public; Owner: -
 --
 
-ALTER TABLE topics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_public.topics ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: forums update_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY update_admin ON forums FOR UPDATE USING (current_user_is_admin());
+CREATE POLICY update_admin ON app_public.forums FOR UPDATE USING (app_public.current_user_is_admin());
 
 
 --
 -- Name: topics update_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY update_admin ON topics FOR UPDATE USING (((author_id = current_user_id()) OR current_user_is_admin()));
+CREATE POLICY update_admin ON app_public.topics FOR UPDATE USING (((author_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
 
 
 --
 -- Name: posts update_admin; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY update_admin ON posts FOR UPDATE USING (((author_id = current_user_id()) OR current_user_is_admin()));
+CREATE POLICY update_admin ON app_public.posts FOR UPDATE USING (((author_id = app_public.current_user_id()) OR app_public.current_user_is_admin()));
 
 
 --
 -- Name: users update_self; Type: POLICY; Schema: app_public; Owner: -
 --
 
-CREATE POLICY update_self ON users FOR UPDATE USING ((id = current_user_id()));
+CREATE POLICY update_self ON app_public.users FOR UPDATE USING ((id = app_public.current_user_id()));
 
 
 --
 -- Name: user_authentications; Type: ROW SECURITY; Schema: app_public; Owner: -
 --
 
-ALTER TABLE user_authentications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_public.user_authentications ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: user_emails; Type: ROW SECURITY; Schema: app_public; Owner: -
 --
 
-ALTER TABLE user_emails ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_public.user_emails ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: users; Type: ROW SECURITY; Schema: app_public; Owner: -
 --
 
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_public.users ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: app_public; Type: ACL; Schema: -; Owner: -
+-- Name: SCHEMA app_public; Type: ACL; Schema: -; Owner: -
 --
 
 GRANT USAGE ON SCHEMA app_public TO graphiledemo_visitor;
 
 
 --
--- Name: users; Type: ACL; Schema: app_public; Owner: -
+-- Name: TABLE users; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT SELECT,DELETE ON TABLE users TO graphiledemo_visitor;
-
-
---
--- Name: users.name; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT UPDATE(name) ON TABLE users TO graphiledemo_visitor;
+GRANT SELECT,DELETE ON TABLE app_public.users TO graphiledemo_visitor;
 
 
 --
--- Name: users.avatar_url; Type: ACL; Schema: app_public; Owner: -
+-- Name: COLUMN users.name; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT UPDATE(avatar_url) ON TABLE users TO graphiledemo_visitor;
-
-
---
--- Name: forums; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT SELECT,DELETE ON TABLE forums TO graphiledemo_visitor;
+GRANT UPDATE(name) ON TABLE app_public.users TO graphiledemo_visitor;
 
 
 --
--- Name: forums.slug; Type: ACL; Schema: app_public; Owner: -
+-- Name: COLUMN users.avatar_url; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT INSERT(slug),UPDATE(slug) ON TABLE forums TO graphiledemo_visitor;
-
-
---
--- Name: forums.name; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT INSERT(name),UPDATE(name) ON TABLE forums TO graphiledemo_visitor;
+GRANT UPDATE(avatar_url) ON TABLE app_public.users TO graphiledemo_visitor;
 
 
 --
--- Name: forums.description; Type: ACL; Schema: app_public; Owner: -
+-- Name: TABLE forums; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT INSERT(description),UPDATE(description) ON TABLE forums TO graphiledemo_visitor;
-
-
---
--- Name: topics; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT SELECT,DELETE ON TABLE topics TO graphiledemo_visitor;
+GRANT SELECT,DELETE ON TABLE app_public.forums TO graphiledemo_visitor;
 
 
 --
--- Name: topics.forum_id; Type: ACL; Schema: app_public; Owner: -
+-- Name: COLUMN forums.slug; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT INSERT(forum_id) ON TABLE topics TO graphiledemo_visitor;
-
-
---
--- Name: topics.title; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT INSERT(title),UPDATE(title) ON TABLE topics TO graphiledemo_visitor;
+GRANT INSERT(slug),UPDATE(slug) ON TABLE app_public.forums TO graphiledemo_visitor;
 
 
 --
--- Name: topics.body; Type: ACL; Schema: app_public; Owner: -
+-- Name: COLUMN forums.name; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT INSERT(body),UPDATE(body) ON TABLE topics TO graphiledemo_visitor;
-
-
---
--- Name: forums_id_seq; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE forums_id_seq TO graphiledemo_visitor;
+GRANT INSERT(name),UPDATE(name) ON TABLE app_public.forums TO graphiledemo_visitor;
 
 
 --
--- Name: posts; Type: ACL; Schema: app_public; Owner: -
+-- Name: COLUMN forums.description; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT SELECT,DELETE ON TABLE posts TO graphiledemo_visitor;
-
-
---
--- Name: posts.topic_id; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT INSERT(topic_id) ON TABLE posts TO graphiledemo_visitor;
+GRANT INSERT(description),UPDATE(description) ON TABLE app_public.forums TO graphiledemo_visitor;
 
 
 --
--- Name: posts.body; Type: ACL; Schema: app_public; Owner: -
+-- Name: TABLE topics; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT INSERT(body),UPDATE(body) ON TABLE posts TO graphiledemo_visitor;
-
-
---
--- Name: posts_id_seq; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE posts_id_seq TO graphiledemo_visitor;
+GRANT SELECT,DELETE ON TABLE app_public.topics TO graphiledemo_visitor;
 
 
 --
--- Name: topics_id_seq; Type: ACL; Schema: app_public; Owner: -
+-- Name: COLUMN topics.forum_id; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT SELECT,USAGE ON SEQUENCE topics_id_seq TO graphiledemo_visitor;
-
-
---
--- Name: user_authentications; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT SELECT,DELETE ON TABLE user_authentications TO graphiledemo_visitor;
+GRANT INSERT(forum_id) ON TABLE app_public.topics TO graphiledemo_visitor;
 
 
 --
--- Name: user_authentications_id_seq; Type: ACL; Schema: app_public; Owner: -
+-- Name: COLUMN topics.title; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT SELECT,USAGE ON SEQUENCE user_authentications_id_seq TO graphiledemo_visitor;
-
-
---
--- Name: user_emails; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT SELECT,DELETE ON TABLE user_emails TO graphiledemo_visitor;
+GRANT INSERT(title),UPDATE(title) ON TABLE app_public.topics TO graphiledemo_visitor;
 
 
 --
--- Name: user_emails.email; Type: ACL; Schema: app_public; Owner: -
+-- Name: COLUMN topics.body; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT INSERT(email) ON TABLE user_emails TO graphiledemo_visitor;
-
-
---
--- Name: user_emails_id_seq; Type: ACL; Schema: app_public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE user_emails_id_seq TO graphiledemo_visitor;
+GRANT INSERT(body),UPDATE(body) ON TABLE app_public.topics TO graphiledemo_visitor;
 
 
 --
--- Name: users_id_seq; Type: ACL; Schema: app_public; Owner: -
+-- Name: SEQUENCE forums_id_seq; Type: ACL; Schema: app_public; Owner: -
 --
 
-GRANT SELECT,USAGE ON SEQUENCE users_id_seq TO graphiledemo_visitor;
+GRANT SELECT,USAGE ON SEQUENCE app_public.forums_id_seq TO graphiledemo_visitor;
+
+
+--
+-- Name: TABLE posts; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT SELECT,DELETE ON TABLE app_public.posts TO graphiledemo_visitor;
+
+
+--
+-- Name: COLUMN posts.topic_id; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT INSERT(topic_id) ON TABLE app_public.posts TO graphiledemo_visitor;
+
+
+--
+-- Name: COLUMN posts.body; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT INSERT(body),UPDATE(body) ON TABLE app_public.posts TO graphiledemo_visitor;
+
+
+--
+-- Name: SEQUENCE posts_id_seq; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE app_public.posts_id_seq TO graphiledemo_visitor;
+
+
+--
+-- Name: SEQUENCE topics_id_seq; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE app_public.topics_id_seq TO graphiledemo_visitor;
+
+
+--
+-- Name: TABLE user_authentications; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT SELECT,DELETE ON TABLE app_public.user_authentications TO graphiledemo_visitor;
+
+
+--
+-- Name: SEQUENCE user_authentications_id_seq; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE app_public.user_authentications_id_seq TO graphiledemo_visitor;
+
+
+--
+-- Name: TABLE user_emails; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT SELECT,DELETE ON TABLE app_public.user_emails TO graphiledemo_visitor;
+
+
+--
+-- Name: COLUMN user_emails.email; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT INSERT(email) ON TABLE app_public.user_emails TO graphiledemo_visitor;
+
+
+--
+-- Name: SEQUENCE user_emails_id_seq; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE app_public.user_emails_id_seq TO graphiledemo_visitor;
+
+
+--
+-- Name: SEQUENCE users_id_seq; Type: ACL; Schema: app_public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE app_public.users_id_seq TO graphiledemo_visitor;
 
 
 --
