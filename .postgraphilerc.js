@@ -53,6 +53,7 @@ module.exports = {
     schema,
     dynamicJson,
     disableGraphiql: !graphiql,
+    enhanceGraphiql: true,
     // We don't set a watch mode here, because there's no way to turn it off (e.g. when using -X) currently.
     appendPlugins,
   },
