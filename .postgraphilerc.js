@@ -31,7 +31,7 @@ const watch = true;
 // Add some Graphile-Build plugins to enhance our GraphQL schema
 const appendPlugins = [
   // Removes the 'ByFooIdAndBarId' from the end of relations
-  PgSimplifyInflectorPlugin,
+  PgSimplifyInflectorPlugin
 ];
 
 module.exports = {
@@ -43,8 +43,8 @@ module.exports = {
       dynamicJson,
       graphiql,
       watchPg: watch,
-      appendPlugins,
-    },
+      appendPlugins
+    }
   },
   // Options for the CLI:
   options: {
@@ -55,6 +55,6 @@ module.exports = {
     disableGraphiql: !graphiql,
     enhanceGraphiql: true,
     // We don't set a watch mode here, because there's no way to turn it off (e.g. when using -X) currently.
-    appendPlugins,
-  },
+    appendPlugins
+  }
 };
