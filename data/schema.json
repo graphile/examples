@@ -74,7 +74,7 @@
               "deprecationReason": null
             },
             {
-              "name": "allForums",
+              "name": "forums",
               "description": "Reads and enables pagination through a set of `Forum`.",
               "args": [
                 {
@@ -2104,7 +2104,7 @@
               "deprecationReason": null
             },
             {
-              "name": "topics",
+              "name": "authoredTopics",
               "description": "Reads and enables pagination through a set of `Topic`.",
               "args": [
                 {
@@ -2199,7 +2199,7 @@
               "deprecationReason": null
             },
             {
-              "name": "posts",
+              "name": "authoredPosts",
               "description": "Reads and enables pagination through a set of `Post`.",
               "args": [
                 {
@@ -5015,7 +5015,7 @@
               "defaultValue": null
             },
             {
-              "name": "forumPatch",
+              "name": "patch",
               "description": "An object where the defined keys will be set on the `Forum` being updated.",
               "type": {
                 "kind": "NON_NULL",
@@ -5169,7 +5169,7 @@
               "defaultValue": null
             },
             {
-              "name": "forumPatch",
+              "name": "patch",
               "description": "An object where the defined keys will be set on the `Forum` being updated.",
               "type": {
                 "kind": "NON_NULL",
@@ -5218,7 +5218,7 @@
               "defaultValue": null
             },
             {
-              "name": "forumPatch",
+              "name": "patch",
               "description": "An object where the defined keys will be set on the `Forum` being updated.",
               "type": {
                 "kind": "NON_NULL",
@@ -5281,7 +5281,7 @@
               "defaultValue": null
             },
             {
-              "name": "postPatch",
+              "name": "patch",
               "description": "An object where the defined keys will be set on the `Post` being updated.",
               "type": {
                 "kind": "NON_NULL",
@@ -5439,7 +5439,7 @@
               "defaultValue": null
             },
             {
-              "name": "postPatch",
+              "name": "patch",
               "description": "An object where the defined keys will be set on the `Post` being updated.",
               "type": {
                 "kind": "NON_NULL",
@@ -5502,7 +5502,7 @@
               "defaultValue": null
             },
             {
-              "name": "topicPatch",
+              "name": "patch",
               "description": "An object where the defined keys will be set on the `Topic` being updated.",
               "type": {
                 "kind": "NON_NULL",
@@ -5670,7 +5670,7 @@
               "defaultValue": null
             },
             {
-              "name": "topicPatch",
+              "name": "patch",
               "description": "An object where the defined keys will be set on the `Topic` being updated.",
               "type": {
                 "kind": "NON_NULL",
@@ -5733,7 +5733,7 @@
               "defaultValue": null
             },
             {
-              "name": "userPatch",
+              "name": "patch",
               "description": "An object where the defined keys will be set on the `User` being updated.",
               "type": {
                 "kind": "NON_NULL",
@@ -6025,7 +6025,7 @@
               "defaultValue": null
             },
             {
-              "name": "userPatch",
+              "name": "patch",
               "description": "An object where the defined keys will be set on the `User` being updated.",
               "type": {
                 "kind": "NON_NULL",
@@ -6074,7 +6074,7 @@
               "defaultValue": null
             },
             {
-              "name": "userPatch",
+              "name": "patch",
               "description": "An object where the defined keys will be set on the `User` being updated.",
               "type": {
                 "kind": "NON_NULL",

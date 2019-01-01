@@ -78,9 +78,10 @@
     lodash "^4.2.0"
     to-fast-properties "^2.0.0"
 
-"@graphile-contrib/pg-simplify-inflector@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@graphile-contrib/pg-simplify-inflector/-/pg-simplify-inflector-2.0.0.tgz#03d7c81a492160ec0d1c92c1a01468c12d3cb880"
+"@graphile-contrib/pg-simplify-inflector@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@graphile-contrib/pg-simplify-inflector/-/pg-simplify-inflector-3.0.0.tgz#fb668befb3be0536911dba48aafd9845a8a2b2d2"
+  integrity sha512-/3D75/BBJLftUBkidAsqGyfJEvzQqGQNJGIhoMwd3lB6a+UW9ofAC9A0h4a7o/mch8m9XZnYjy399ikwwsNE+g==
 
 "@koa/cors@2.2.1":
   version "2.2.1"

@@ -1105,7 +1105,7 @@ type Query implements Node {
   ): Node
 
   """Reads and enables pagination through a set of `Forum`."""
-  allForums(
+  forums(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -1403,7 +1403,7 @@ input UpdateForumByIdInput {
   """
   An object where the defined keys will be set on the `Forum` being updated.
   """
-  forumPatch: ForumPatch!
+  patch: ForumPatch!
   id: Int!
 }
 
@@ -1418,7 +1418,7 @@ input UpdateForumBySlugInput {
   """
   An object where the defined keys will be set on the `Forum` being updated.
   """
-  forumPatch: ForumPatch!
+  patch: ForumPatch!
 
   """An URL-safe alias for the `Forum`."""
   slug: String!
@@ -1440,7 +1440,7 @@ input UpdateForumInput {
   """
   An object where the defined keys will be set on the `Forum` being updated.
   """
-  forumPatch: ForumPatch!
+  patch: ForumPatch!
 }
 
 """The output of our update `Forum` mutation."""
@@ -1477,7 +1477,7 @@ input UpdatePostByIdInput {
   """
   An object where the defined keys will be set on the `Post` being updated.
   """
-  postPatch: PostPatch!
+  patch: PostPatch!
   id: Int!
 }
 
@@ -1497,7 +1497,7 @@ input UpdatePostInput {
   """
   An object where the defined keys will be set on the `Post` being updated.
   """
-  postPatch: PostPatch!
+  patch: PostPatch!
 }
 
 """The output of our update `Post` mutation."""
@@ -1540,7 +1540,7 @@ input UpdateTopicByIdInput {
   """
   An object where the defined keys will be set on the `Topic` being updated.
   """
-  topicPatch: TopicPatch!
+  patch: TopicPatch!
   id: Int!
 }
 
@@ -1560,7 +1560,7 @@ input UpdateTopicInput {
   """
   An object where the defined keys will be set on the `Topic` being updated.
   """
-  topicPatch: TopicPatch!
+  patch: TopicPatch!
 }
 
 """The output of our update `Topic` mutation."""
@@ -1603,7 +1603,7 @@ input UpdateUserByIdInput {
   """
   An object where the defined keys will be set on the `User` being updated.
   """
-  userPatch: UserPatch!
+  patch: UserPatch!
 
   """Unique identifier for the user."""
   id: Int!
@@ -1620,7 +1620,7 @@ input UpdateUserByUsernameInput {
   """
   An object where the defined keys will be set on the `User` being updated.
   """
-  userPatch: UserPatch!
+  patch: UserPatch!
 
   """Public-facing username (or 'handle') of the user."""
   username: String!
@@ -1642,7 +1642,7 @@ input UpdateUserInput {
   """
   An object where the defined keys will be set on the `User` being updated.
   """
-  userPatch: UserPatch!
+  patch: UserPatch!
 }
 
 """The output of our update `User` mutation."""
@@ -1722,7 +1722,7 @@ type User implements Node {
   ): UserEmailsConnection!
 
   """Reads and enables pagination through a set of `Topic`."""
-  topics(
+  authoredTopics(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -1751,7 +1751,7 @@ type User implements Node {
   ): TopicsConnection!
 
   """Reads and enables pagination through a set of `Post`."""
-  posts(
+  authoredPosts(
     """Only read the first `n` values of the set."""
     first: Int
 
