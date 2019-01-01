@@ -4,6 +4,7 @@
     "lint": "eslint .",
     "client:react": "cd client-react; npm start",
     "server:koa2": "cd server-koa2; npm start",
+    "server:postgraphile": ". ./.env; postgraphile",
     "start": "concurrently --kill-others 'npm run server:koa2' 'npm run client:react'"
   },
   "private": true,
@@ -28,6 +29,6 @@
     "prettier": "1.13.6"
   },
   "engines": {
-      "node": ">=8.11.3 <10.4.0"
+    "node": ">=8.11.3 <11"
   }
 }

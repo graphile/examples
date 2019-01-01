@@ -46,6 +46,7 @@ module.exports = {
   },
   // Options for the CLI:
   options: {
+    defaultRole: "graphiledemo_visitor",
     connection,
     schema,
     dynamicJson,
