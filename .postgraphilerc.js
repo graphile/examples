@@ -1,13 +1,15 @@
 const PgSimplifyInflectorPlugin = require("@graphile-contrib/pg-simplify-inflector");
 
-['AUTH_DATABASE_URL', 'NODE_ENV'].forEach(envvar => {
+["AUTH_DATABASE_URL", "NODE_ENV"].forEach(envvar => {
   if (!process.env[envvar]) {
     // We automatically source `.env` in the various scripts; but in case that
     // hasn't been done lets raise an error and stop.
     console.error("");
     console.error("");
     console.error("⚠️⚠️⚠️⚠️");
-    console.error(`No ${envvar} found in your environment; perhaps you need to run 'source ./.env'?`);
+    console.error(
+      `No ${envvar} found in your environment; perhaps you need to run 'source ./.env'?`
+    );
     console.error("⚠️⚠️⚠️⚠️");
     console.error("");
     process.exit(1);
