@@ -48,7 +48,7 @@ insert into app_public.topics(forum_id, author_id, title, body) values
   (1, 2, 'Thank you!', '500-1500 requests per second on a single server is pretty awesome.'),
   (1, 4, 'PostGraphile is powerful', 'PostGraphile is a powerful, idomatic, and elegant tool.'),
   (1, 5, 'Recently launched', 'At this point, it’s quite hard for me to come back and enjoy working with REST.'),
-  (2, 1, 'I love cats!', 'They''re the best!');
+  (3, 1, 'I love cats!', 'They''re the best!');
 
 insert into app_public.posts(topic_id, author_id, body) values
   (1, 1, 'I''m super pleased with the performance - thanks!'),
