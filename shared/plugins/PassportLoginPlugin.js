@@ -11,7 +11,7 @@ const PassportLoginPlugin = makeExtendSchemaPlugin(build => ({
     }
 
     type RegisterPayload {
-      user: User! @recurseDataGenerators
+      user: User! @pgField
     }
 
     input LoginInput {
@@ -20,7 +20,7 @@ const PassportLoginPlugin = makeExtendSchemaPlugin(build => ({
     }
 
     type LoginPayload {
-      user: User! @recurseDataGenerators
+      user: User! @pgField
     }
 
     extend type Mutation {
@@ -78,7 +78,7 @@ const PassportLoginPlugin = makeExtendSchemaPlugin(build => ({
             }
           );
           return {
-            user: row,
+            data: row,
           };
         } catch (e) {
           console.error(e);
@@ -127,7 +127,7 @@ const PassportLoginPlugin = makeExtendSchemaPlugin(build => ({
             }
           );
           return {
-            user: row,
+            data: row,
           };
         } catch (e) {
           console.error(e);
