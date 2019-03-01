@@ -18,7 +18,9 @@ const PgSimplifyInflectorPlugin = require("@graphile-contrib/pg-simplify-inflect
 
 const isDev = process.env.NODE_ENV === "development";
 
-// Our database URL
+// Our database URL - privileged
+const ownerConnection = process.env.ROOT_DATABASE_URL;
+// Our database URL - unprivileged
 const connection = process.env.AUTH_DATABASE_URL;
 // The PostgreSQL schema within our postgres DB to expose
 const schema = ["app_public"];
@@ -40,6 +42,7 @@ module.exports = {
     connection,
     schema,
     options: {
+      ownerConnectionString: ownerConnection,
       dynamicJson,
       graphiql,
       watchPg: watch,
@@ -48,6 +51,7 @@ module.exports = {
   },
   // Options for the CLI:
   options: {
+    ownerConnection,
     defaultRole: "graphiledemo_visitor",
     connection,
     schema,

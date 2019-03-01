@@ -7,16 +7,10 @@ const middleware = require("./middleware");
 sharedUtils.sanitiseEnv();
 
 const rootPgPool = new pg.Pool({
-  connectionString: process.env.ROOT_DATABASE_URL,
+  connectionString: process.env.ROOT_DATABASE_URL
 });
 
 const isDev = process.env.NODE_ENV === "development";
-
-// We're using a non-super-user connection string, so we need to install the
-// watch fixtures ourself.
-if (isDev) {
-  sharedUtils.installWatchFixtures(rootPgPool);
-}
 
 const app = new Koa();
 const server = http.createServer(app.callback());

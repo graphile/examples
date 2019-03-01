@@ -1,5 +1,3 @@
-const fs = require("fs");
-
 exports.sanitiseEnv = () => {
   const requiredEnvvars = ["AUTH_DATABASE_URL", "ROOT_DATABASE_URL"];
   requiredEnvvars.forEach(envvar => {
@@ -11,22 +9,4 @@ exports.sanitiseEnv = () => {
   });
 
   process.env.NODE_ENV = process.env.NODE_ENV || "development";
-};
-
-exports.installWatchFixtures = rootPgPool => {
-  // Install the watch fixtures manually
-  const fixtures = fs.readFileSync(
-    require.resolve("graphile-build-pg/res/watch-fixtures.sql"),
-    "utf8"
-  );
-  rootPgPool.query(fixtures).then(
-    () => {
-      console.log(`Loaded watch fixtures ✅`);
-      console.log(`Ignore the "Failed to setup watch fixtures" warning`);
-    },
-    e => {
-      console.error("Failed to load watch fixtures 🔥");
-      console.error(e);
-    }
-  );
 };
