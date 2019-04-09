@@ -5,7 +5,7 @@ begin
 end;
 $$ language plpgsql set search_path from current;
 
-comment on function app_private.tg__add_job_for_row is
+comment on function app_private.tg__add_job_for_row() is
   E'Useful shortcut to create a job on insert or update. Pass the task name as the trigger argument, and the record id will automatically be available on the JSON payload.';
 
 --------------------------------------------------------------------------------
