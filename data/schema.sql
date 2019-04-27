@@ -421,7 +421,7 @@ begin
     elsif v_email is not null then
       -- See if the email is registered
       select * into v_user_email from app_public.user_emails where email = v_email and is_verified is true;
-      if v_user_email is not null then
+      if not (v_user_email is null) then
         -- User exists!
         insert into app_public.user_authentications (user_id, service, identifier, details) values
           (v_user_email.user_id, f_service, f_identifier, f_profile) returning id, user_id into v_matched_authentication_id, v_matched_user_id;

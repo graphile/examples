@@ -51,7 +51,7 @@ const PassportLoginPlugin = makeExtendSchemaPlugin(build => ({
               name => $3,
               avatar_url => $4,
               password => $5
-            ) users where users is not null`,
+            ) users where not (users is null)`,
             [username, email, name, avatarUrl, password]
           );
 
@@ -100,7 +100,7 @@ const PassportLoginPlugin = makeExtendSchemaPlugin(build => ({
           const {
             rows: [user],
           } = await rootPgPool.query(
-            `select users.* from app_private.login($1, $2) users where users is not null`,
+            `select users.* from app_private.login($1, $2) users where not (users is null)`,
             [username, password]
           );
 
