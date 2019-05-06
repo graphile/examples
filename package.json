@@ -18,17 +18,9 @@
     ]
   },
   "devDependencies": {
-    "babel-eslint": "9.0.0",
-    "concurrently": "3.6.0",
-    "eslint": "5.6.0",
-    "eslint-config-prettier": "2.9.0",
-    "eslint-plugin-graphql": "2.1.1",
-    "eslint-plugin-prettier": "2.6.1",
-    "eslint-plugin-react": "7.10.0",
-    "eslint_d": "5.3.1",
-    "prettier": "1.13.6"
+    "concurrently": "3.6.0"
   },
   "engines": {
-    "node": ">=8.11.3 <11"
+    "node": ">=8.11.3"
   }
 }
