@@ -18,7 +18,7 @@ create table app_public.users (
 alter table app_public.users enable row level security;
 
 create trigger _100_timestamps
-  after insert or update on app_public.users
+  before insert or update on app_public.users
   for each row
   execute procedure app_private.tg__update_timestamps();
 
@@ -122,7 +122,7 @@ create table app_public.user_emails (
 create unique index uniq_user_emails_verified_email on app_public.user_emails(email) where is_verified is true;
 alter table app_public.user_emails enable row level security;
 create trigger _100_timestamps
-  after insert or update on app_public.user_emails
+  before insert or update on app_public.user_emails
   for each row
   execute procedure app_private.tg__update_timestamps();
 create trigger _900_send_verification_email
@@ -193,7 +193,7 @@ create table app_public.user_authentications (
 );
 alter table app_public.user_authentications enable row level security;
 create trigger _100_timestamps
-  after insert or update on app_public.user_authentications
+  before insert or update on app_public.user_authentications
   for each row
   execute procedure app_private.tg__update_timestamps();
 
@@ -558,7 +558,7 @@ begin
     elsif v_email is not null then
       -- See if the email is registered
       select * into v_user_email from app_public.user_emails where email = v_email and is_verified is true;
-      if v_user_email is not null then
+      if not (v_user_email is null) then
         -- User exists!
         insert into app_public.user_authentications (user_id, service, identifier, details) values
           (v_user_email.user_id, f_service, f_identifier, f_profile) returning id, user_id into v_matched_authentication_id, v_matched_user_id;

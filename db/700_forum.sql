@@ -10,7 +10,7 @@ create table app_public.forums (
 );
 alter table app_public.forums enable row level security;
 create trigger _100_timestamps
-  after insert or update on app_public.forums
+  before insert or update on app_public.forums
   for each row
   execute procedure app_private.tg__update_timestamps();
 
@@ -45,7 +45,7 @@ create table app_public.topics (
 );
 alter table app_public.topics enable row level security;
 create trigger _100_timestamps
-  after insert or update on app_public.topics
+  before insert or update on app_public.topics
   for each row
   execute procedure app_private.tg__update_timestamps();
 
@@ -93,7 +93,7 @@ create table app_public.posts (
 );
 alter table app_public.posts enable row level security;
 create trigger _100_timestamps
-  after insert or update on app_public.posts
+  before insert or update on app_public.posts
   for each row
   execute procedure app_private.tg__update_timestamps();
 
