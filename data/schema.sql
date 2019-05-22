@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.4
--- Dumped by pg_dump version 10.4
+-- Dumped from database version 11.2
+-- Dumped by pg_dump version 11.2
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -34,20 +34,6 @@ CREATE SCHEMA app_private;
 --
 
 CREATE SCHEMA app_public;
-
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
@@ -384,7 +370,7 @@ COMMENT ON COLUMN app_public.users.is_admin IS 'If true, the user has elevated p
 
 CREATE FUNCTION app_private.link_or_register_user(f_user_id integer, f_service character varying, f_identifier character varying, f_profile json, f_auth_details json) RETURNS app_public.users
     LANGUAGE plpgsql SECURITY DEFINER
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 declare
   v_matched_user_id int;
@@ -474,7 +460,7 @@ COMMENT ON FUNCTION app_private.link_or_register_user(f_user_id integer, f_servi
 
 CREATE FUNCTION app_private.login(username text, password text) RETURNS app_public.users
     LANGUAGE plpgsql STRICT SECURITY DEFINER
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 declare
   v_user app_public.users;
@@ -550,7 +536,7 @@ COMMENT ON FUNCTION app_private.login(username text, password text) IS 'Returns 
 
 CREATE FUNCTION app_private.really_create_user(username text, email text, email_is_verified boolean, name text, avatar_url text, password text DEFAULT NULL::text) RETURNS app_public.users
     LANGUAGE plpgsql
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 declare
   v_user app_public.users;
@@ -619,7 +605,7 @@ COMMENT ON FUNCTION app_private.really_create_user(username text, email text, em
 
 CREATE FUNCTION app_private.register_user(f_service character varying, f_identifier character varying, f_profile json, f_auth_details json, f_email_is_verified boolean DEFAULT false) RETURNS app_public.users
     LANGUAGE plpgsql SECURITY DEFINER
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 declare
   v_user app_public.users;
@@ -668,7 +654,7 @@ COMMENT ON FUNCTION app_private.register_user(f_service character varying, f_ide
 
 CREATE FUNCTION app_private.tg__add_job_for_row() RETURNS trigger
     LANGUAGE plpgsql
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 begin
   perform app_jobs.add_job(tg_argv[0], json_build_object('id', NEW.id));
@@ -690,11 +676,11 @@ COMMENT ON FUNCTION app_private.tg__add_job_for_row() IS 'Useful shortcut to cre
 
 CREATE FUNCTION app_private.tg__update_timestamps() RETURNS trigger
     LANGUAGE plpgsql
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 begin
   NEW.created_at = (case when TG_OP = 'INSERT' then NOW() else OLD.created_at end);
-  NEW.updated_at = (case when TG_OP = 'UPDATE' and OLD.updated_at <= NOW() then OLD.updated_at + interval '1 millisecond' else NOW() end);
+  NEW.updated_at = (case when TG_OP = 'UPDATE' and OLD.updated_at >= NOW() then OLD.updated_at + interval '1 millisecond' else NOW() end);
   return NEW;
 end;
 $$;
@@ -713,7 +699,7 @@ COMMENT ON FUNCTION app_private.tg__update_timestamps() IS 'This trigger should 
 
 CREATE FUNCTION app_private.tg_user_email_secrets__insert_with_user_email() RETURNS trigger
     LANGUAGE plpgsql
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 declare
   v_verification_token text;
@@ -740,7 +726,7 @@ COMMENT ON FUNCTION app_private.tg_user_email_secrets__insert_with_user_email() 
 
 CREATE FUNCTION app_private.tg_user_secrets__insert_with_user() RETURNS trigger
     LANGUAGE plpgsql
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 begin
   insert into app_private.user_secrets(user_id) values(NEW.id);
@@ -762,7 +748,7 @@ COMMENT ON FUNCTION app_private.tg_user_secrets__insert_with_user() IS 'Ensures 
 
 CREATE FUNCTION app_private.tg_users__make_first_user_admin() RETURNS trigger
     LANGUAGE plpgsql
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 begin
   if not exists(select 1 from app_public.users) then
@@ -779,7 +765,7 @@ $$;
 
 CREATE FUNCTION app_public."current_user"() RETURNS app_public.users
     LANGUAGE sql STABLE
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
   select users.* from app_public.users where id = app_public.current_user_id();
 $$;
@@ -791,7 +777,7 @@ $$;
 
 CREATE FUNCTION app_public.current_user_id() RETURNS integer
     LANGUAGE sql STABLE
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
   select nullif(current_setting('jwt.claims.user_id', true), '')::int;
 $$;
@@ -811,7 +797,7 @@ Handy method to get the current user ID for use in RLS policies, etc; in GraphQL
 
 CREATE FUNCTION app_public.current_user_is_admin() RETURNS boolean
     LANGUAGE sql STABLE
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
   -- We're using exists here because it guarantees true/false rather than true/false/null
   select exists(
@@ -834,7 +820,7 @@ Handy method to determine if the current user is an admin, for use in RLS polici
 
 CREATE FUNCTION app_public.forgot_password(email text) RETURNS boolean
     LANGUAGE plpgsql STRICT SECURITY DEFINER
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 declare
   v_user_email app_public.user_emails;
@@ -982,7 +968,7 @@ COMMENT ON FUNCTION app_public.random_number() IS 'Chosen by fair dice roll. Gua
 
 CREATE FUNCTION app_public.reset_password(user_id integer, reset_token text, new_password text) RETURNS app_public.users
     LANGUAGE plpgsql STRICT SECURITY DEFINER
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
 declare
   v_user app_public.users;
@@ -1091,7 +1077,7 @@ COMMENT ON COLUMN app_public.topics.body IS 'The body of the `Topic`, which Post
 
 CREATE FUNCTION app_public.topics_body_summary(t app_public.topics, max_length integer DEFAULT 30) RETURNS text
     LANGUAGE sql STABLE
-    SET search_path TO "$user", public
+    SET search_path TO '$user', 'public'
     AS $$
   select case
     when length(t.body) > max_length
@@ -1672,42 +1658,42 @@ CREATE TRIGGER _900_notify_worker AFTER INSERT ON app_jobs.jobs FOR EACH STATEME
 -- Name: users _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.users FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps BEFORE INSERT OR UPDATE ON app_public.users FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: user_emails _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.user_emails FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps BEFORE INSERT OR UPDATE ON app_public.user_emails FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: user_authentications _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.user_authentications FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps BEFORE INSERT OR UPDATE ON app_public.user_authentications FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: forums _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.forums FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps BEFORE INSERT OR UPDATE ON app_public.forums FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: topics _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.topics FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps BEFORE INSERT OR UPDATE ON app_public.topics FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
 -- Name: posts _100_timestamps; Type: TRIGGER; Schema: app_public; Owner: -
 --
 
-CREATE TRIGGER _100_timestamps AFTER INSERT OR UPDATE ON app_public.posts FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
+CREATE TRIGGER _100_timestamps BEFORE INSERT OR UPDATE ON app_public.posts FOR EACH ROW EXECUTE PROCEDURE app_private.tg__update_timestamps();
 
 
 --
@@ -2176,8 +2162,8 @@ GRANT SELECT,USAGE ON SEQUENCE app_public.users_id_seq TO graphiledemo_visitor;
 -- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: app_public; Owner: -
 --
 
-ALTER DEFAULT PRIVILEGES FOR ROLE graphiledemo IN SCHEMA app_public REVOKE ALL ON SEQUENCES  FROM graphiledemo;
-ALTER DEFAULT PRIVILEGES FOR ROLE graphiledemo IN SCHEMA app_public GRANT SELECT,USAGE ON SEQUENCES  TO graphiledemo_visitor;
+ALTER DEFAULT PRIVILEGES FOR ROLE benjiegillam IN SCHEMA app_public REVOKE ALL ON SEQUENCES  FROM benjiegillam;
+ALTER DEFAULT PRIVILEGES FOR ROLE benjiegillam IN SCHEMA app_public GRANT SELECT,USAGE ON SEQUENCES  TO graphiledemo_visitor;
 
 
 --

@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "db:reset": "psql -X1v ON_ERROR_STOP=1 graphiledemo -f ./db/schema.sql",
+    "db:reset": "psql -X1v ON_ERROR_STOP=1 graphiledemo -f ./db/reset.sql",
     "lint": "eslint .",
     "client:react": "cd client-react; npm start",
     "server:koa2": "cd server-koa2; npm start",
