@@ -2162,8 +2162,8 @@ GRANT SELECT,USAGE ON SEQUENCE app_public.users_id_seq TO graphiledemo_visitor;
 -- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: app_public; Owner: -
 --
 
-ALTER DEFAULT PRIVILEGES FOR ROLE benjiegillam IN SCHEMA app_public REVOKE ALL ON SEQUENCES  FROM benjiegillam;
-ALTER DEFAULT PRIVILEGES FOR ROLE benjiegillam IN SCHEMA app_public GRANT SELECT,USAGE ON SEQUENCES  TO graphiledemo_visitor;
+ALTER DEFAULT PRIVILEGES FOR ROLE graphiledemo IN SCHEMA app_public REVOKE ALL ON SEQUENCES  FROM graphiledemo;
+ALTER DEFAULT PRIVILEGES FOR ROLE graphiledemo IN SCHEMA app_public GRANT SELECT,USAGE ON SEQUENCES  TO graphiledemo_visitor;
 
 
 --
