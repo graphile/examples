@@ -658,7 +658,7 @@ type ForumsConnection {
   pageInfo: PageInfo!
 
   """The count of *all* `Forum` you could get from the connection."""
-  totalCount: Int
+  totalCount: Int!
 }
 
 """A `Forum` edge in the connection."""
@@ -1054,7 +1054,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   """The count of *all* `Post` you could get from the connection."""
-  totalCount: Int
+  totalCount: Int!
 }
 
 """A `Post` edge in the connection."""
@@ -1359,7 +1359,7 @@ type TopicsConnection {
   pageInfo: PageInfo!
 
   """The count of *all* `Topic` you could get from the connection."""
-  totalCount: Int
+  totalCount: Int!
 }
 
 """A `Topic` edge in the connection."""
@@ -1893,7 +1893,7 @@ type UserEmailsConnection {
   pageInfo: PageInfo!
 
   """The count of *all* `UserEmail` you could get from the connection."""
-  totalCount: Int
+  totalCount: Int!
 }
 
 """A `UserEmail` edge in the connection."""

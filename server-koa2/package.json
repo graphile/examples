@@ -27,7 +27,7 @@
     "koa-static": "5.0.0",
     "passport-github": "1.1.0",
     "pg": "7.4.3",
-    "postgraphile": "^4.4.0-beta.1"
+    "postgraphile": "^4.4.1-rc.0"
   },
   "devDependencies": {
     "nodemon": "1.17.5"
