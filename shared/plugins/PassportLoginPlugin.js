@@ -37,10 +37,16 @@ const PassportLoginPlugin = makeExtendSchemaPlugin(build => ({
         resolveInfo,
         { selectGraphQLResultFromTable }
       ) {
-        const { username, password, email, name, avatarUrl } = args.input;
+        const {
+          username,
+          password,
+          email,
+          name = null,
+          avatarUrl = null,
+        } = args.input;
         const { rootPgPool, login, pgClient } = context;
         try {
-          // Call our login function to find out if the username/password combination exists
+          // Call our register function from the database
           const {
             rows: [user],
           } = await rootPgPool.query(
@@ -82,8 +88,8 @@ const PassportLoginPlugin = makeExtendSchemaPlugin(build => ({
           };
         } catch (e) {
           console.error(e);
-          // TODO: check that this is indeed why it failed
-          throw new Error("Login failed: incorrect username/password");
+          // TODO: determine why it failed
+          throw new Error("Registration failed");
         }
       },
       async login(
