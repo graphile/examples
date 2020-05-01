@@ -16,18 +16,22 @@
     "react-dom": "^16.4.1",
     "react-router-dom": "4.3.1",
     "react-scripts": "3.3.0",
-    "slug": "0.9.2"
+    "slug": "0.9.2",
+    "snyk": "^1.316.1"
   },
   "scripts": {
     "start": "if [ -x ../.env ]; then . ../.env; fi; BROWSER=none PORT=$CLIENT_PORT react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "browserslist": [
     ">0.2%",
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "snyk": true
 }
