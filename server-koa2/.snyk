@@ -1,0 +1,12 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.14.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-567746:
+    - postgraphile > postgraphile-core > graphile-build > lodash:
+        patched: '2020-05-01T07:35:14.582Z'
+    - postgraphile > postgraphile-core > graphile-build-pg > lodash:
+        patched: '2020-05-01T07:35:14.582Z'
+    - postgraphile > postgraphile-core > graphile-build-pg > graphile-build > lodash:
+        patched: '2020-05-01T07:35:14.582Z'
