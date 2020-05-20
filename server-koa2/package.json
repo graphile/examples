@@ -14,7 +14,7 @@
     "@graphile-contrib/pg-simplify-inflector": "^4.0.0-alpha.0",
     "@koa/cors": "2.2.1",
     "graphile-utils": "^4.4.0-beta.1",
-    "http-proxy": "1.17.0",
+    "http-proxy": "1.18.1",
     "koa": "2.5.1",
     "koa-bodyparser": "4.2.1",
     "koa-bunyan-logger": "2.1.0",
