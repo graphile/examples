@@ -20,7 +20,7 @@
     "koa-bunyan-logger": "2.1.0",
     "koa-compress": "3.0.0",
     "koa-helmet": "4.0.0",
-    "koa-jwt": "3.3.2",
+    "koa-jwt": "4.0.4",
     "koa-passport": "5.0.0",
     "koa-route": "3.2.0",
     "koa-session": "5.8.1",
