@@ -26,7 +26,7 @@
     "koa-session": "5.8.1",
     "koa-static": "5.0.0",
     "passport-github": "1.1.0",
-    "pg": "7.4.3",
+    "pg": "8.4.0",
     "postgraphile": "^4.4.1-rc.0"
   },
   "devDependencies": {
