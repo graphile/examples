@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@graphile-contrib/pg-simplify-inflector": "^4.0.0-alpha.0",
-    "@koa/cors": "2.2.1",
+    "@koa/cors": "5.0.0",
     "graphile-utils": "^4.4.0-beta.1",
     "http-proxy": "1.18.1",
     "koa": "2.5.1",
